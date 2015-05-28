@@ -5,7 +5,7 @@ import pyblish.api
 
 
 @pyblish.api.log
-class SelectWriteNodes(pyblish.api.Selector):
+class SelectDeadlineWriteNodes(pyblish.api.Selector):
     """Selects all write nodes"""
 
     hosts = ['nuke']
@@ -25,7 +25,6 @@ class SelectWriteNodes(pyblish.api.Selector):
             if node.Class() == 'Write' and not node['disable'].getValue():
                 instance = context.create_instance(name=node.name())
                 instance.set_data('family', value='deadline.render')
-                instance.set_data("publish", False)
 
                 output = node['file'].getValue()
 

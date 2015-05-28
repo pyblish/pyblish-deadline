@@ -7,7 +7,7 @@ import pymel.versions as pv
 
 
 @pyblish.api.log
-class SelectRenderlayers(pyblish.api.Selector):
+class SelectDeadlineRenderlayers(pyblish.api.Selector):
     """ Gathers all renderlayers
     """
 
@@ -76,7 +76,6 @@ class SelectRenderlayers(pyblish.api.Selector):
 
                 instance = context.create_instance(name=layer.name())
                 instance.set_data('family', value='deadline.render')
-                instance.set_data("publish", False)
 
                 # getting layer name
                 if layer.name() == 'defaultRenderLayer':
