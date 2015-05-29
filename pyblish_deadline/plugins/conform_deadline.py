@@ -3,7 +3,6 @@ import getpass
 import subprocess
 
 import pyblish.api
-import pyblish.plugin
 
 
 @pyblish.api.log
@@ -29,10 +28,10 @@ class ConformDeadline(pyblish.api.Conformer):
 
         job_data['Frames'] = instance.data('deadlineFrames')
 
-        if pyblish.plugin.current_host() == 'maya':
+        if pyblish.api.current_host() == 'maya':
             job_data['Plugin'] = 'MayaBatch'
 
-        if pyblish.plugin.current_host() == 'nuke':
+        if pyblish.api.current_host() == 'nuke':
             job_data['Plugin'] = 'Nuke'
 
         # writing job data
