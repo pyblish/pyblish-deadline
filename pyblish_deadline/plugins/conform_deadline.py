@@ -44,6 +44,12 @@ class ConformDeadline(pyblish.api.Conformer):
                 data += 'ExtraInfo%s=%s\n' % (index, v)
             del job_data['ExtraInfo']
 
+        if 'DraftTemplates' in job_data:
+            for t in job_data['DraftTemplates']:
+                index = job_data['DraftTemplates'].index(t)
+                job_data['ExtraInfoKeyValue']['DraftTemplate%s' % index] = t
+            del job_data['DraftTemplates']
+
         if 'ExtraInfoKeyValue' in job_data:
             index = 0
             for entry in job_data['ExtraInfoKeyValue']:
@@ -58,6 +64,8 @@ class ConformDeadline(pyblish.api.Conformer):
 
         current_dir = instance.data('deadlineOutput')
         job_path = os.path.join(current_dir, job_data['Name'] + '.job.txt')
+
+        self.log.info(data)
 
         with open(job_path, 'w') as outfile:
             outfile.write(data)
