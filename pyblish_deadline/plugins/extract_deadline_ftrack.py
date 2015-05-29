@@ -30,8 +30,8 @@ class ExtractDeadlineFtrack(pyblish.api.Extractor):
         task_name = ftrack_data['Task']['name']
         task_id = ftrack_data['Task']['id']
 
-        asset_name = context.data('ftrackData')['Asset']['name']
-        asset_id = context.data('ftrackData')['Asset']['id']
+        asset_name = ftrack_data['Asset']['name']
+        asset_id = ftrack_data['Asset']['id']
 
         version_number = ftrack_data['version']['number']
 
