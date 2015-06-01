@@ -64,8 +64,6 @@ class ConformDeadline(pyblish.api.Conformer):
         current_dir = instance.data('deadlineOutput')
         job_path = os.path.join(current_dir, job_data['Name'] + '.job.txt')
 
-        self.log.info(data)
-
         with open(job_path, 'w') as outfile:
             outfile.write(data)
 
