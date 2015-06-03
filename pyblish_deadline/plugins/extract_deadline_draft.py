@@ -2,7 +2,7 @@ import pyblish.api
 
 
 @pyblish.api.log
-class ExtractDraft(pyblish.api.Extractor):
+class ExtractDeadlineDraft(pyblish.api.Extractor):
     """ Gathers Draft related data for Deadline
     """
 

@@ -5,7 +5,7 @@ import pyblish.api
 
 
 @pyblish.api.log
-class SelectWriteNodes(pyblish.api.Selector):
+class SelectDeadlineWriteNodes(pyblish.api.Selector):
     """Selects all write nodes"""
 
     hosts = ['nuke']

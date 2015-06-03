@@ -5,7 +5,7 @@ import nuke
 
 
 @pyblish.api.log
-class ValidateRenderOrder(pyblish.api.Validator):
+class ValidateDeadlineRenderOrder(pyblish.api.Validator):
     """Validates the write nodes render order"""
 
     families = ['deadline.render']

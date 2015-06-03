@@ -4,7 +4,7 @@ import pyblish.api
 
 
 @pyblish.api.log
-class ValidateOutputExistence(pyblish.api.Validator):
+class ValidateDeadlineOutputExistence(pyblish.api.Validator):
     """Validates that the output directory for the write nodes exists"""
 
     families = ['deadline.render']

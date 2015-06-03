@@ -7,7 +7,7 @@ import pymel.versions as pv
 
 
 @pyblish.api.log
-class SelectRenderlayers(pyblish.api.Selector):
+class SelectDeadlineRenderlayers(pyblish.api.Selector):
     """ Gathers all renderlayers
     """
 

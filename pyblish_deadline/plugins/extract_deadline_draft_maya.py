@@ -1,15 +1,15 @@
 import pyblish.api
 
-import nuke
+import pymel
 
 
 @pyblish.api.log
-class ExtractDraft(pyblish.api.Extractor):
-    """ Gathers host specifics Draft related data for Deadline
+class ExtractDeadlineDraftMaya(pyblish.api.Extractor):
+    """ Gathers host specific Draft related data for Deadline
     """
 
     families = ['deadline.render']
-    hosts = ['nuke']
+    hosts = ['maya']
     version = (0, 1, 0)
 
     def process_context(self, context):
@@ -24,8 +24,10 @@ class ExtractDraft(pyblish.api.Extractor):
         if 'ExtraInfoKeyValue' in job_data:
             extra_info_key_value = job_data['ExtraInfoKeyValue']
 
-        height = nuke.root().format().height()
-        width = nuke.root().format().width()
+        width = None
+        height = None
+
+        # TODO: get resolution dimensions
 
         extra_info_key_value['DraftFrameWidth'] = width
         extra_info_key_value['DraftFrameHeight'] = height
