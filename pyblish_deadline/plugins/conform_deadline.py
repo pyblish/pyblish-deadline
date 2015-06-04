@@ -10,7 +10,6 @@ class ConformDeadline(pyblish.api.Conformer):
 
     families = ['deadline.render']
     hosts = ['*']
-    optional = True
 
     def process_instance(self, instance):
 
