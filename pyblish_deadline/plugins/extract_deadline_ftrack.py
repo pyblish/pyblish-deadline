@@ -33,7 +33,11 @@ class ExtractDeadlineFtrack(pyblish.api.Extractor):
         asset_name = ftrack_data['Asset']['name']
         asset_id = ftrack_data['Asset']['id']
 
+        version_id = ftrack_data['AssetVersion']['id']
+
         version_number = context.data('version')
+
+        # component_name = ftrack_data['ftrackComponentName']
 
         # setting extra info
         extra_info = []
@@ -52,13 +56,16 @@ class ExtractDeadlineFtrack(pyblish.api.Extractor):
 
         extra_info_key_value['FT_TaskName'] = task_name
         extra_info_key_value['FT_Description'] = 'Pyblish'
-        extra_info_key_value['FT_VersionId'] = ''
+        extra_info_key_value['FT_VersionUsedId'] = version_id
         extra_info_key_value['FT_ProjectId'] = project_id
-        extra_info_key_value['FT_AssetName'] = asset_name
+        extra_info_key_value['FT_AssetName'] = 'Render'
         extra_info_key_value['FT_AssetId'] = asset_id
         extra_info_key_value['FT_TaskId'] = task_id
         extra_info_key_value['FT_ProjectName'] = project_name
         extra_info_key_value['FT_Username'] = username
+        extra_info_key_value['FT_VersionNumber'] = version_number
+        # extra_info_key_value['FT_ComponentName'] = component_name
+
 
         job_data['ExtraInfoKeyValue'] = extra_info_key_value
 
