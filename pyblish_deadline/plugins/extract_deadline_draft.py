@@ -28,6 +28,16 @@ class ExtractDeadlineDraft(pyblish.api.Extractor):
         extra_info_key_value['DraftUploadToShotgun'] = 'False'
         extra_info_key_value['DraftEntity'] = ''
 
+        if 'nuke' in pyblish.api.current_host():
+            width = nuke.root().format().width()
+            height = nuke.root().format().height()
+        else:
+            width = None
+            height = None
+
+        extra_info_key_value['DraftFrameWidth'] = width
+        extra_info_key_value['DraftFrameHeight'] = height
+
         job_data['ExtraInfoKeyValue'] = extra_info_key_value
 
         context.set_data('deadlineJobData', value=job_data)
