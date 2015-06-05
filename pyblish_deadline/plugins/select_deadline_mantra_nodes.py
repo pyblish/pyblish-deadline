@@ -74,4 +74,3 @@ class SelectDeadlineMantraNodes(pyblish.api.Selector):
                 # plugin_data['Build'] = None
 
                 instance.set_data('deadlinePluginData', value=plugin_data)
-                instance.set_data('ftrackComponentName', value=node.name())
