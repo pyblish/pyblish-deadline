@@ -7,8 +7,9 @@ class ExtractDeadlineDraftCustom(pyblish.api.Extractor):
     """
 
     families = ['deadline.render']
-    hosts = ['*']
+    hosts = ['nuke']
     version = (0, 1, 0)
+    optional = True
 
     def process_context(self, context):
 
@@ -22,7 +23,7 @@ class ExtractDeadlineDraftCustom(pyblish.api.Extractor):
         if 'ExtraInfoKeyValue' in job_data:
             extra_info_key_value = job_data['ExtraInfoKeyValue']
 
-        t = r'K:/tools/Deadline/draft-templates/quicktime_MPEG4_and_DNxHD.py'
+        t = r'K:\.core\repos\DeadlineRepository7\custom\draft\encode_to_mov_h264_540p.py'
         extra_info_key_value['DraftTemplate'] = t
 
         context.set_data('deadlineJobData', value=job_data)

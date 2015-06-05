@@ -7,7 +7,7 @@ import pyblish.api
 class ExtractDeadlineFtrack(pyblish.api.Extractor):
     """ Gathers Ftrack related data for Deadline
     """
-
+    order = pyblish.api.Extractor.order + 0.5
     families = ['deadline.render']
     hosts = ['*']
     version = (0, 1, 0)
@@ -56,9 +56,9 @@ class ExtractDeadlineFtrack(pyblish.api.Extractor):
 
         extra_info_key_value['FT_TaskName'] = task_name
         extra_info_key_value['FT_Description'] = 'Pyblish'
-        extra_info_key_value['FT_VersionUsedId'] = version_id
+        extra_info_key_value['FT_VersionId'] = version_id
         extra_info_key_value['FT_ProjectId'] = project_id
-        extra_info_key_value['FT_AssetName'] = 'Render'
+        extra_info_key_value['FT_AssetName'] = asset_name
         extra_info_key_value['FT_AssetId'] = asset_id
         extra_info_key_value['FT_TaskId'] = task_id
         extra_info_key_value['FT_ProjectName'] = project_name
