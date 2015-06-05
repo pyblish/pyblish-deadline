@@ -55,7 +55,7 @@ class ExtractDeadlineFtrack(pyblish.api.Extractor):
             extra_info_key_value = job_data['ExtraInfoKeyValue']
 
         extra_info_key_value['FT_TaskName'] = task_name
-        extra_info_key_value['FT_Description'] = 'Pyblish'
+        extra_info_key_value['FT_Description'] = ''
         extra_info_key_value['FT_VersionId'] = version_id
         extra_info_key_value['FT_ProjectId'] = project_id
         extra_info_key_value['FT_AssetName'] = asset_name
