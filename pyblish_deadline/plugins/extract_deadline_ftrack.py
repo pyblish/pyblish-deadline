@@ -11,6 +11,7 @@ class ExtractDeadlineFtrack(pyblish.api.Extractor):
     families = ['deadline.render']
     hosts = ['*']
     version = (0, 1, 0)
+    optional = True
 
     def process_context(self, context):
 

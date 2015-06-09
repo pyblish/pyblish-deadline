@@ -9,6 +9,7 @@ class ExtractDeadlineDraft(pyblish.api.Extractor):
     families = ['deadline.render']
     hosts = ['*']
     version = (0, 1, 0)
+    optional = True
 
     def process_context(self, context):
 
@@ -29,6 +30,7 @@ class ExtractDeadlineDraft(pyblish.api.Extractor):
         extra_info_key_value['DraftEntity'] = ''
 
         if 'nuke' in pyblish.api.current_host():
+            import nuke
             width = nuke.root().format().width()
             height = nuke.root().format().height()
         else:
