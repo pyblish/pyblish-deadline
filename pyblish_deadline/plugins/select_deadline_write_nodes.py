@@ -10,8 +10,9 @@ class SelectDeadlineWriteNodes(pyblish.api.Selector):
 
     hosts = ['nuke']
     version = (0, 1, 0)
+    label = 'Select Write Nodes'
 
-    def process_context(self, context):
+    def process(self, context):
 
         # storing plugin data
         plugin_data = {'EnforceRenderOrder': True}
@@ -33,8 +34,8 @@ class SelectDeadlineWriteNodes(pyblish.api.Selector):
 
                 # setting job data
                 job_data = {}
-                if context.has_data('deadlineJobData'):
-                    job_data = context.data('deadlineJobData').copy()
+                if instance.has_data('deadlineJobData'):
+                    job_data = instance.data('deadlineJobData').copy()
 
                 # output_file = os.path.basename(output)
                 output_file = output
@@ -47,7 +48,7 @@ class SelectDeadlineWriteNodes(pyblish.api.Selector):
 
                 job_data['OutputFilename0'] = output_file
 
-                instance.context.set_data('deadlineJobData', value=job_data)
+                instance.set_data('deadlineJobData', value=job_data)
 
                 # frame range
                 start_frame = int(nuke.root()['first_frame'].getValue())

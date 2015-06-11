@@ -12,13 +12,14 @@ class ExtractDeadlineFtrack(pyblish.api.Extractor):
     hosts = ['*']
     version = (0, 1, 0)
     optional = True
+    label = 'Extract Ftrack to Deadline'
 
-    def process_context(self, context):
+    def process(self, context, instance):
 
         # getting job data
         job_data = {}
-        if context.has_data('deadlineJobData'):
-            job_data = context.data('deadlineJobData').copy()
+        if instance.has_data('deadlineJobData'):
+            job_data = instance.data('deadlineJobData').copy()
 
         # getting data
         username = getpass.getuser()
@@ -35,10 +36,17 @@ class ExtractDeadlineFtrack(pyblish.api.Extractor):
         asset_id = ftrack_data['Asset']['id']
 
         version_id = ftrack_data['AssetVersion']['id']
+        version_used_id = ''
+
+        if instance.has_data('ftrackVersionUsedID'):
+            version_id = ''
+            version_used_id = instance.data('ftrackVersionUsedID')
 
         version_number = context.data('version')
 
-        # component_name = ftrack_data['ftrackComponentName']
+        component_name = None
+        if instance.has_data('ftrack_components'):
+            component_name = instance.data('ftrack_components').keys()[0]
 
         # setting extra info
         extra_info = []
@@ -58,6 +66,7 @@ class ExtractDeadlineFtrack(pyblish.api.Extractor):
         extra_info_key_value['FT_TaskName'] = task_name
         extra_info_key_value['FT_Description'] = ''
         extra_info_key_value['FT_VersionId'] = version_id
+        extra_info_key_value['FT_VersionUsedId'] = version_used_id
         extra_info_key_value['FT_ProjectId'] = project_id
         extra_info_key_value['FT_AssetName'] = asset_name
         extra_info_key_value['FT_AssetId'] = asset_id
@@ -65,9 +74,9 @@ class ExtractDeadlineFtrack(pyblish.api.Extractor):
         extra_info_key_value['FT_ProjectName'] = project_name
         extra_info_key_value['FT_Username'] = username
         extra_info_key_value['FT_VersionNumber'] = version_number
-        # extra_info_key_value['FT_ComponentName'] = component_name
+        extra_info_key_value['FT_ComponentName'] = component_name
 
 
         job_data['ExtraInfoKeyValue'] = extra_info_key_value
 
-        context.set_data('deadlineJobData', value=job_data)
+        instance.set_data('deadlineJobData', value=job_data)

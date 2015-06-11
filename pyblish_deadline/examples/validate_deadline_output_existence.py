@@ -11,7 +11,7 @@ class ValidateDeadlineOutputExistence(pyblish.api.Validator):
     hosts = ['*']
     version = (0, 1, 0)
 
-    def process_instance(self, instance):
+    def process(self, instance):
         path = instance.data('deadlineOutput')
 
         if not os.path.exists(path):

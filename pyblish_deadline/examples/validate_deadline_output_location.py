@@ -13,7 +13,7 @@ class ValidateDeadlineOutputLocation(pyblish.api.Validator):
     version = (0, 1, 0)
     optional = True
 
-    def process_instance(self, instance):
+    def process(self, instance):
         # checking output
         path = instance.data('deadlineOutput')
         mount = self.find_mount_point(path)

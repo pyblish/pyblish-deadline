@@ -11,7 +11,7 @@ class ExtractDeadlineDraftCustom(pyblish.api.Extractor):
     version = (0, 1, 0)
     optional = True
 
-    def process_context(self, context):
+    def process(self, context):
 
         # getting job data
         job_data = {}

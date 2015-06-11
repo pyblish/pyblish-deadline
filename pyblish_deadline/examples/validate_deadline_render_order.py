@@ -29,14 +29,14 @@ class ValidateDeadlineRenderOrder(pyblish.api.Validator):
 
         return len(write_nodes)
 
-    def process_instance(self, instance):
+    def process(self, instance):
         node = nuke.toNode(str(instance))
 
         if self.get_render_order(node) != node['render_order'].getValue():
             msg = '%s render order was incorrect.' % instance
             raise ValueError(msg)
 
-    def repair_instance(self, instance):
+    def repair(self, instance):
         """Auto-repair correct render order"""
         node = nuke.toNode(str(instance))
         node['render_order'].setValue(self.get_render_order(node))

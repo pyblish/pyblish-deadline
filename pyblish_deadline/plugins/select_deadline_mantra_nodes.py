@@ -12,11 +12,10 @@ class SelectDeadlineMantraNodes(pyblish.api.Selector):
     hosts = ['houdini']
     version = (0, 1, 0)
 
-    def process_context(self, context):
+    def process(self, context):
 
         # storing plugin data
         plugin_data = {}
-
 
 
         renderNode = hou.node( "/out" )
@@ -40,8 +39,8 @@ class SelectDeadlineMantraNodes(pyblish.api.Selector):
 
                 # setting job data
                 job_data = {}
-                if context.has_data('deadlineJobData'):
-                    job_data = context.data('deadlineJobData').copy()
+                if instance.has_data('deadlineJobData'):
+                    job_data = instance.data('deadlineJobData').copy()
 
                 # output_file = os.path.basename(output)
                 #
@@ -70,7 +69,7 @@ class SelectDeadlineMantraNodes(pyblish.api.Selector):
                 job_data['OutputFilename0'] = paddedOutputFile
                 job_data['Plugin'] = 'Houdini'
 
-                instance.context.set_data('deadlineJobData', value=job_data)
+                instance.set_data('deadlineJobData', value=job_data)
 
                 # frame range
                 start_frame = int(node.parm('f1').eval())
@@ -91,6 +90,11 @@ class SelectDeadlineMantraNodes(pyblish.api.Selector):
                 # plugin_data['Build'] = None
 
                 instance.set_data('deadlinePluginData', value=plugin_data)
+
+
+                components = {node.name(): {}}
+                instance.set_data('ftrackComponents', value=components)
+
 
     def right_replace(self, fullString, oldString, newString, occurences ):
         return newString.join(fullString.rsplit( oldString, occurences ) )
