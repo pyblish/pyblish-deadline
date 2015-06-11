@@ -1,5 +1,6 @@
 import os
 import pyblish.api
+import re
 
 
 import hou
@@ -14,7 +15,7 @@ class SelectDeadlineMantraNodes(pyblish.api.Selector):
     def process_context(self, context):
 
         # storing plugin data
-        plugin_data = {'EnforceRenderOrder': True}
+        plugin_data = {}
 
 
 
@@ -30,7 +31,6 @@ class SelectDeadlineMantraNodes(pyblish.api.Selector):
                 instance.set_data('outputPathExpanded', value=node.parm('vm_picture').eval())
                 instance.set_data('outputPath', value=node.parm('vm_picture').unexpandedString())
 
-
                 # instance.add(node)
 
                 output = node.parm('vm_picture').eval()
@@ -43,15 +43,31 @@ class SelectDeadlineMantraNodes(pyblish.api.Selector):
                 if context.has_data('deadlineJobData'):
                     job_data = context.data('deadlineJobData').copy()
 
-                output_file = os.path.basename(output)
+                # output_file = os.path.basename(output)
+                #
+                # if '$F' in output_file:
+                #     padding = int(output_file.split('F')[1])
+                #     padding_string = '$F{}'.format(padding)
+                #     tmp = '#' * padding
+                #     output_file = output_file.replace(padding_string, tmp)
 
-                if '$F' in output_file:
-                    padding = int(output_file.split('F')[1])
-                    padding_string = '$F{}'.format(padding)
-                    tmp = '#' * padding
-                    output_file = output_file.replace(padding_string, tmp)
+                paddedNumberRegex = re.compile( "([0-9]+)", re.IGNORECASE )
 
-                job_data['OutputFilename0'] = output_file
+                paddedOutputFile = ""
+
+                # Check the output file
+                # output = GetOutputPath( renderNode )
+                output_file = output
+                matches = paddedNumberRegex.findall( os.path.basename( output_file ) )
+                if matches != None and len( matches ) > 0:
+                    paddingString = matches[ len( matches ) - 1 ]
+                    paddingSize = len( paddingString )
+                    padding = "#"
+                    while len(padding) < paddingSize:
+                        padding = padding + "#"
+                    paddedOutputFile = self.right_replace( output_file, paddingString, padding, 1 )
+
+                job_data['OutputFilename0'] = paddedOutputFile
                 job_data['Plugin'] = 'Houdini'
 
                 instance.context.set_data('deadlineJobData', value=job_data)
@@ -71,6 +87,10 @@ class SelectDeadlineMantraNodes(pyblish.api.Selector):
                 # plugin_data['IFD'] = None
                 plugin_data['OutputDriver'] = node.path()
                 plugin_data['Version'] = '14'
+                plugin_data['IgnoreInputs'] = '0'
                 # plugin_data['Build'] = None
 
                 instance.set_data('deadlinePluginData', value=plugin_data)
+
+    def right_replace(self, fullString, oldString, newString, occurences ):
+        return newString.join(fullString.rsplit( oldString, occurences ) )

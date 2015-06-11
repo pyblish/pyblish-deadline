@@ -36,7 +36,8 @@ class SelectDeadlineWriteNodes(pyblish.api.Selector):
                 if context.has_data('deadlineJobData'):
                     job_data = context.data('deadlineJobData').copy()
 
-                output_file = os.path.basename(output)
+                # output_file = os.path.basename(output)
+                output_file = output
 
                 if '%' in output_file:
                     padding = int(output_file.split('%')[1][0:2])
