@@ -1,6 +1,7 @@
 import os
 import getpass
 import subprocess
+import tempfile
 
 import pyblish.api
 
@@ -67,11 +68,13 @@ class ConformDeadline(pyblish.api.Conformer):
         for entry in job_data:
             data += '%s=%s\n' % (entry, job_data[entry])
 
-        current_dir = instance.data('deadlineOutput')
+        current_dir = tempfile.gettempdir()
         job_path = os.path.join(current_dir, job_data['Name'] + '.job.txt')
 
         with open(job_path, 'w') as outfile:
             outfile.write(data)
+
+        self.log.info('job data:\n\n%s' % data)
 
         # getting plugin data
         plugin_data = instance.data('deadlinePluginData')
@@ -83,17 +86,23 @@ class ConformDeadline(pyblish.api.Conformer):
         for entry in plugin_data:
             data += '%s=%s\n' % (entry, plugin_data[entry])
 
-        current_dir = instance.data('deadlineOutput')
+        current_dir = tempfile.gettempdir()
         plugin_path = os.path.join(current_dir,
                                    job_data['Name'] + '.plugin.txt')
 
         with open(plugin_path, 'w') as outfile:
             outfile.write(data)
 
+        self.log.info('plugin data:\n\n%s' % data)
+
         # submitting job
         args = [job_path, plugin_path]
 
         self.log.info(self.CallDeadlineCommand(args))
+
+        # deleting temporary files
+        os.remove(job_path)
+        os.remove(plugin_path)
 
     def CallDeadlineCommand(self, arguments, hideWindow=True):
         # On OSX, we look for the DEADLINE_PATH file. On other platforms, we use the environment variable.

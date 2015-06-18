@@ -12,7 +12,8 @@ class ValidateDeadlineOutputExistence(pyblish.api.Validator):
     version = (0, 1, 0)
 
     def process(self, instance):
-        path = instance.data('deadlineOutput')
+        path = instance.data('deadlineJobData')['OutputFilename0']
+        path = os.dirname(path)
 
         if not os.path.exists(path):
             msg = 'Output directory for %s doesn\'t exists: %s' % (instance,
@@ -21,7 +22,8 @@ class ValidateDeadlineOutputExistence(pyblish.api.Validator):
 
     def repair_instance(self, instance):
         """Auto-repair creates the output directory"""
-        path = instance.data('deadlineOutput')
+        path = instance.data('deadlineJobData')['OutputFilename0']
+        path = os.dirname(path)
 
         if not os.path.exists(path):
             os.makedirs(path)
