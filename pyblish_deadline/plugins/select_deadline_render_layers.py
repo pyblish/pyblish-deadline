@@ -13,9 +13,9 @@ class SelectDeadlineRenderlayers(pyblish.api.Selector):
 
     hosts = ['maya']
     version = (0, 1, 0)
-    name = 'Select Renderlayers'
+    label = 'Select Renderlayers'
 
-    def process_context(self, context):
+    def process(self, context):
 
         # storing current layer
         current_layer = pm.nodetypes.RenderLayer.currentLayer()
@@ -98,7 +98,7 @@ class SelectDeadlineRenderlayers(pyblish.api.Selector):
                 output_file = os.path.basename(path)
                 job_data['OutputFilename0'] = output_file
 
-                context.set_data('deadlineJobData', value=job_data)
+                instance.set_data('deadlineJobData', value=job_data)
 
                 # setting output
                 output = os.path.dirname(path.format(render_layer=layer_name))

@@ -9,13 +9,15 @@ class ExtractDeadlineDraft(pyblish.api.Extractor):
     families = ['deadline.render']
     hosts = ['*']
     version = (0, 1, 0)
+    optional = True
+    label = 'Extract Draft to Deadline'
 
-    def process_context(self, context):
+    def process(self, instance):
 
         # getting job data
         job_data = {}
-        if context.has_data('deadlineJobData'):
-            job_data = context.data('deadlineJobData').copy()
+        if instance.has_data('deadlineJobData'):
+            job_data = instance.data('deadlineJobData').copy()
 
         # setting extra info key values
         extra_info_key_value = {}
@@ -28,6 +30,17 @@ class ExtractDeadlineDraft(pyblish.api.Extractor):
         extra_info_key_value['DraftUploadToShotgun'] = 'False'
         extra_info_key_value['DraftEntity'] = ''
 
+        if 'nuke' in pyblish.api.current_host():
+            import nuke
+            width = nuke.root().format().width()
+            height = nuke.root().format().height()
+        else:
+            width = None
+            height = None
+
+        extra_info_key_value['DraftFrameWidth'] = width
+        extra_info_key_value['DraftFrameHeight'] = height
+
         job_data['ExtraInfoKeyValue'] = extra_info_key_value
 
-        context.set_data('deadlineJobData', value=job_data)
+        instance.set_data('deadlineJobData', value=job_data)

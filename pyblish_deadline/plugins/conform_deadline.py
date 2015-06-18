@@ -10,21 +10,27 @@ class ConformDeadline(pyblish.api.Conformer):
 
     families = ['deadline.render']
     hosts = ['*']
-    optional = True
+    label = 'Send to Deadline'
 
-    def process_instance(self, instance):
+    def process(self, context, instance):
 
-        job_data = instance.context.data('deadlineJobData')
+        job_data = instance.data('deadlineJobData')
 
-        # getting job data
-        name = os.path.basename(instance.context.data('currentFile'))
+        # getting input
+        scene_file = context.data('currentFile')
+
+        if context.has_data('deadlineInput'):
+            scene_file = context.data('deadlineInput')
+
+        name = os.path.basename(scene_file)
         name = os.path.splitext(name)[0]
         name += ' - ' + str(instance)
+
+        # getting job data
+
         job_data['Name'] = name
 
         job_data['UserName'] = getpass.getuser()
-
-        job_data['OutputDirectory0'] = instance.data('deadlineOutput')
 
         job_data['Frames'] = instance.data('deadlineFrames')
 
@@ -69,12 +75,6 @@ class ConformDeadline(pyblish.api.Conformer):
 
         # getting plugin data
         plugin_data = instance.data('deadlinePluginData')
-
-        # setting input
-        scene_file = instance.context.data('currentFile')
-
-        if instance.context.has_data('deadlineInput'):
-            scene_file = instance.context.data('deadlineInput')
 
         plugin_data['SceneFile'] = scene_file
 
