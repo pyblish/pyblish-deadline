@@ -12,7 +12,7 @@ class ExtractDeadlineFtrack(pyblish.api.Extractor):
     hosts = ['*']
     version = (0, 1, 0)
     optional = True
-    label = 'Extract Ftrack to Deadline'
+    label = 'Ftrack to Deadline'
 
     def process(self, instance):
 
