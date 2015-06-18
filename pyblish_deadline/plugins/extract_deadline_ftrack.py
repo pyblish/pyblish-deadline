@@ -45,8 +45,8 @@ class ExtractDeadlineFtrack(pyblish.api.Extractor):
         version_number = instance.context.data('version')
 
         component_name = None
-        if instance.has_data('ftrack_components'):
-            component_name = instance.data('ftrack_components').keys()[0]
+        if instance.has_data('ftrackComponents'):
+            component_name = instance.data('ftrackComponents').keys()[0]
 
         # setting extra info
         extra_info = []
