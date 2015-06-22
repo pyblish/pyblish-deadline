@@ -7,7 +7,7 @@ import pyblish.api
 class ExtractDeadlineFtrack(pyblish.api.Extractor):
     """ Gathers Ftrack related data for Deadline
     """
-    order = pyblish.api.Extractor.order + 0.5
+    order = pyblish.api.Extractor.order + 0.4
     families = ['deadline.render']
     hosts = ['*']
     version = (0, 1, 0)
