@@ -13,15 +13,15 @@ class ConformDeadline(pyblish.api.Conformer):
     hosts = ['*']
     label = 'Send to Deadline'
 
-    def process(self, instance):
+    def process(self, context, instance):
 
         job_data = instance.data('deadlineJobData')
 
         # getting input
-        scene_file = instance.context.data('currentFile')
+        scene_file = context.data('currentFile')
 
-        if instance.context.has_data('deadlineInput'):
-            scene_file = instance.context.data('deadlineInput')
+        if context.has_data('deadlineInput'):
+            scene_file = context.data('deadlineInput')
 
         name = os.path.basename(scene_file)
         name = os.path.splitext(name)[0]
