@@ -13,7 +13,7 @@ class SelectDeadlineRenderlayers(pyblish.api.Selector):
 
     hosts = ['maya']
     version = (0, 1, 0)
-    label = 'Select Renderlayers'
+    name = 'Select Renderlayers'
 
     def process(self, context):
 
@@ -35,9 +35,11 @@ class SelectDeadlineRenderlayers(pyblish.api.Selector):
         padding = render_globals.extensionPadding.get()
         firstFrame = int(render_globals.startFrame.get())
         stringFrame = str(firstFrame).zfill(padding)
-        if stringFrame in path:
+        if stringFrame in os.path.basename(path):
             tmp = '#' * padding
-            path = path.replace(stringFrame, tmp)
+            basename = os.path.basename(path).replace(stringFrame, tmp)
+            dirname = os.path.dirname(path)
+            path = os.path.join(dirname, basename)
 
         layer = pm.nodetypes.RenderLayer.currentLayer()
         if layer.name() == 'defaultRenderLayer':
@@ -70,6 +72,10 @@ class SelectDeadlineRenderlayers(pyblish.api.Selector):
 
         #creating instances
         for layer in pm.ls(type='renderLayer'):
+            if 'defaultRenderLayer' in layer.name() and \
+            layer.name() != 'defaultRenderLayer':
+                continue
+
             if layer.renderable.get():
 
                 layer.setCurrent()
@@ -99,10 +105,6 @@ class SelectDeadlineRenderlayers(pyblish.api.Selector):
                 job_data['OutputFilename0'] = output_file
 
                 instance.set_data('deadlineJobData', value=job_data)
-
-                # setting output
-                output = os.path.dirname(path.format(render_layer=layer_name))
-                instance.set_data('deadlineOutput', value=output)
 
         # restoring current layer
         current_layer.setCurrent()

@@ -35,8 +35,6 @@ class SelectDeadlineMantraNodes(pyblish.api.Selector):
                 output = node.parm('vm_picture').eval()
                 output_path = os.path.dirname(output)
 
-                instance.set_data('deadlineOutput', value=output_path)
-
                 # setting job data
                 job_data = {}
                 if instance.has_data('deadlineJobData'):
