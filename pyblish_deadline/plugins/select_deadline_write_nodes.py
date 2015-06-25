@@ -30,9 +30,6 @@ class SelectDeadlineWriteNodes(pyblish.api.Selector):
 
                 output = node['file'].getValue()
 
-                output_path = os.path.dirname(node['file'].getValue())
-                instance.set_data('deadlineOutput', value=output_path)
-
                 # setting job data
                 job_data = {}
                 if instance.has_data('deadlineJobData'):
