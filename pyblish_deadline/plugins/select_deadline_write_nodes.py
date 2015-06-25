@@ -30,10 +30,14 @@ class SelectDeadlineWriteNodes(pyblish.api.Selector):
 
                 output = node['file'].getValue()
 
+<<<<<<< HEAD
                 output_path = os.path.dirname(node['file'].getValue())
                 instance.set_data('deadlineOutput', value=output_path)
 
                 # setting job datanot
+=======
+                # setting job data
+>>>>>>> 14c61f95c6badf4340138a4da0fff00c87f25e3c
                 job_data = {}
                 if instance.has_data('deadlineJobData'):
                     job_data = instance.data('deadlineJobData').copy()

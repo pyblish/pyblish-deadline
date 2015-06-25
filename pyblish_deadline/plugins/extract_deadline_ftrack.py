@@ -7,12 +7,12 @@ import pyblish.api
 class ExtractDeadlineFtrack(pyblish.api.Extractor):
     """ Gathers Ftrack related data for Deadline
     """
-    order = pyblish.api.Extractor.order + 0.5
+    order = pyblish.api.Extractor.order + 0.4
     families = ['deadline.render']
     hosts = ['*']
     version = (0, 1, 0)
     optional = True
-    label = 'Extract Ftrack to Deadline'
+    label = 'Ftrack to Deadline'
 
     def process(self, context, instance):
 
@@ -44,11 +44,17 @@ class ExtractDeadlineFtrack(pyblish.api.Extractor):
 
         version_number = context.data('version')
 
+<<<<<<< HEAD
         component_name = 'main'
         if instance.has_data('ftrackComponents'):
             component_name = instance.data('ftrackComponents').keys()[0]
 
 
+=======
+        component_name = None
+        if instance.has_data('ftrackComponents'):
+            component_name = instance.data('ftrackComponents').keys()[0]
+>>>>>>> 14c61f95c6badf4340138a4da0fff00c87f25e3c
 
         # setting extra info
         extra_info = []
