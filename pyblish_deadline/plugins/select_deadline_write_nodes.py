@@ -32,7 +32,7 @@ class SelectDeadlineWriteNodes(pyblish.api.Selector):
                 output_path = os.path.dirname(node['file'].getValue())
                 instance.set_data('deadlineOutput', value=output_path)
 
-                # setting job data
+                # setting job datanot
                 job_data = {}
                 if instance.has_data('deadlineJobData'):
                     job_data = instance.data('deadlineJobData').copy()
@@ -63,5 +63,12 @@ class SelectDeadlineWriteNodes(pyblish.api.Selector):
                 # setting plugin data
                 plugin_data = plugin_data.copy()
                 plugin_data['WriteNode'] = node.name()
+
+                try:
+                    components = {node['fcompname'].getValue(): {}}
+                    instance.set_data('ftrackComponents', value=components)#
+                except:
+                    pass
+
 
                 instance.set_data('deadlinePluginData', value=plugin_data)
