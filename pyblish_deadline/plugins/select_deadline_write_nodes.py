@@ -25,6 +25,7 @@ class SelectDeadlineWriteNodes(pyblish.api.Selector):
         for node in nuke.allNodes():
             if node.Class() == 'Write' and not node['disable'].getValue():
                 instance = context.create_instance(name=node.name())
+                instance.add(node)
                 instance.set_data('family', value='deadline.render')
 
                 output = node['file'].getValue()
