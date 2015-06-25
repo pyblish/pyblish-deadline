@@ -10,13 +10,14 @@ class ExtractDeadlineDraft(pyblish.api.Extractor):
     hosts = ['*']
     version = (0, 1, 0)
     optional = True
+    label = 'Extract Draft to Deadline'
 
-    def process_context(self, context):
+    def process(self, instance):
 
         # getting job data
         job_data = {}
-        if context.has_data('deadlineJobData'):
-            job_data = context.data('deadlineJobData').copy()
+        if instance.has_data('deadlineJobData'):
+            job_data = instance.data('deadlineJobData').copy()
 
         # setting extra info key values
         extra_info_key_value = {}
@@ -42,4 +43,4 @@ class ExtractDeadlineDraft(pyblish.api.Extractor):
 
         job_data['ExtraInfoKeyValue'] = extra_info_key_value
 
-        context.set_data('deadlineJobData', value=job_data)
+        instance.set_data('deadlineJobData', value=job_data)
