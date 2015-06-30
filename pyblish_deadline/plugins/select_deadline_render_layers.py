@@ -103,6 +103,10 @@ class SelectDeadlineRenderlayers(pyblish.api.Selector):
 
                 instance.set_data('deadlineJobData', value=job_data)
 
+                # adding ftrack data to activate processing
+                instance.set_data('ftrackComponents', value={})
+                instance.set_data('ftrackAssetType', value='img')
+
         pm.general.refresh(suspend=False)
         pm.system.undoInfo(closeChunk=True)
         pm.system.undo()
