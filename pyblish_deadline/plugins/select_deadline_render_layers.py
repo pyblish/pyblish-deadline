@@ -1,7 +1,6 @@
 import os
 
 import pyblish.api
-
 import pymel.core as pm
 import pymel.versions as pv
 
@@ -16,9 +15,6 @@ class SelectDeadlineRenderlayers(pyblish.api.Selector):
     name = 'Select Renderlayers'
 
     def process(self, context):
-
-        # storing current layer
-        current_layer = pm.nodetypes.RenderLayer.currentLayer()
 
         # getting output path
         render_globals = pm.PyNode('defaultRenderGlobals')
@@ -64,17 +60,15 @@ class SelectDeadlineRenderlayers(pyblish.api.Selector):
         plugin_data['Build'] = pv.bitness()
 
         drg = pm.PyNode('defaultRenderGlobals')
-        plugin_data['Renderer'] = drg.currentRenderer.get()
 
         # arnold specifics
         if drg.currentRenderer.get() == 'arnold':
             plugin_data['Animation'] = 1
 
         #creating instances
+        pm.system.undoInfo(openChunk=True)
+        pm.general.refresh(suspend=True)
         for layer in pm.ls(type='renderLayer'):
-            if 'defaultRenderLayer' in layer.name() and \
-            layer.name() != 'defaultRenderLayer':
-                continue
 
             if layer.renderable.get():
 
@@ -92,19 +86,23 @@ class SelectDeadlineRenderlayers(pyblish.api.Selector):
                 # setting plugin_data
                 plugin_data = plugin_data.copy()
                 plugin_data['RenderLayer'] = layer_name
+                plugin_data['Renderer'] = drg.currentRenderer.get()
 
                 instance.set_data('deadlinePluginData', value=plugin_data)
 
                 # setting job data
+                job_data = job_data.copy()
+
                 start_frame = int(render_globals.startFrame.get())
                 end_frame = int(render_globals.endFrame.get())
                 frames = '%s-%s' % (start_frame, end_frame)
                 instance.set_data('deadlineFrames', value=frames)
 
-                output_file = os.path.basename(path)
-                job_data['OutputFilename0'] = output_file
+                output = path.format(render_layer=layer_name)
+                job_data['OutputFilename0'] = output
 
                 instance.set_data('deadlineJobData', value=job_data)
 
-        # restoring current layer
-        current_layer.setCurrent()
+        pm.general.refresh(suspend=False)
+        pm.system.undoInfo(closeChunk=True)
+        pm.system.undo()
