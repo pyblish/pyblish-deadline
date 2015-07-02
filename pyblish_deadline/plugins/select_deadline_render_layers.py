@@ -1,8 +1,9 @@
 import os
+import traceback
 
 import pyblish.api
-import pymel.core as pm
-import pymel.versions as pv
+import pymel
+import maya
 
 
 @pyblish.api.log
@@ -17,13 +18,17 @@ class SelectDeadlineRenderlayers(pyblish.api.Selector):
     def process(self, context):
 
         # getting output path
-        render_globals = pm.PyNode('defaultRenderGlobals')
+        render_globals = pymel.core.PyNode('defaultRenderGlobals')
         start_frame = render_globals.startFrame.get()
 
-        paths = [str(pm.system.Workspace.getPath().expand())]
-        paths.append(str(pm.system.Workspace.fileRules['images']))
+        paths = [str(pymel.core.system.Workspace.getPath().expand())]
+        try:
+            paths.append(str(pymel.core.system.Workspace.fileRules['images']))
+        except:
+            pass
+
         output_path = os.path.join(*paths)
-        tmp = pm.rendering.renderSettings(firstImageName=True)[0]
+        tmp = pymel.core.rendering.renderSettings(firstImageName=True)[0]
         paths.append(str(tmp))
 
         path = os.path.join(*paths)
@@ -37,7 +42,7 @@ class SelectDeadlineRenderlayers(pyblish.api.Selector):
             dirname = os.path.dirname(path)
             path = os.path.join(dirname, basename)
 
-        layer = pm.nodetypes.RenderLayer.currentLayer()
+        layer = pymel.core.nodetypes.RenderLayer.currentLayer()
         if layer.name() == 'defaultRenderLayer':
             layer_name = 'masterLayer'
         else:
@@ -53,60 +58,70 @@ class SelectDeadlineRenderlayers(pyblish.api.Selector):
         # storing plugin data
         plugin_data = {'UsingRenderLayers': 1}
 
-        tmp = str(pm.system.Workspace.getPath().expand())
+        tmp = str(pymel.core.system.Workspace.getPath().expand())
         plugin_data['ProjectPath'] = tmp
 
-        plugin_data['Version'] = pv.flavor()
-        plugin_data['Build'] = pv.bitness()
+        plugin_data['Version'] = pymel.versions.flavor()
+        plugin_data['Build'] = pymel.versions.bitness()
 
-        drg = pm.PyNode('defaultRenderGlobals')
+        drg = pymel.core.PyNode('defaultRenderGlobals')
 
         # arnold specifics
         if drg.currentRenderer.get() == 'arnold':
             plugin_data['Animation'] = 1
 
-        #creating instances
-        pm.system.undoInfo(openChunk=True)
-        pm.general.refresh(suspend=True)
-        for layer in pm.ls(type='renderLayer'):
+        # storing modified state
+        modified = maya.cmds.file(q=True, mf=True)
 
-            if layer.renderable.get():
+        # turn display off
+        pymel.core.general.select(clear=True)
+        panel = pymel.core.getPanel(withFocus=True)
+        pymel.core.general.isolateSelect(panel, state=1)
 
-                layer.setCurrent()
+        try:
+            for layer in pymel.core.ls(type='renderLayer'):
 
-                instance = context.create_instance(name=layer.name())
-                instance.set_data('family', value='deadline.render')
+                if layer.renderable.get() and \
+                ':defaultRenderLayer' not in layer.name():
 
-                # getting layer name
-                if layer.name() == 'defaultRenderLayer':
-                    layer_name = 'masterLayer'
-                else:
-                    layer_name = layer.name()
+                    layer.setCurrent()
 
-                # setting plugin_data
-                plugin_data = plugin_data.copy()
-                plugin_data['RenderLayer'] = layer_name
-                plugin_data['Renderer'] = drg.currentRenderer.get()
+                    instance = context.create_instance(name=layer.name())
+                    instance.set_data('family', value='deadline.render')
 
-                instance.set_data('deadlinePluginData', value=plugin_data)
+                    # getting layer name
+                    if layer.name() == 'defaultRenderLayer':
+                        layer_name = 'masterLayer'
+                    else:
+                        layer_name = layer.name()
 
-                # setting job data
-                job_data = job_data.copy()
+                    # setting plugin_data
+                    plugin_data = plugin_data.copy()
+                    plugin_data['RenderLayer'] = layer_name
+                    plugin_data['Renderer'] = drg.currentRenderer.get()
 
-                start_frame = int(render_globals.startFrame.get())
-                end_frame = int(render_globals.endFrame.get())
-                frames = '%s-%s' % (start_frame, end_frame)
-                instance.set_data('deadlineFrames', value=frames)
+                    instance.set_data('deadlinePluginData', value=plugin_data)
 
-                output = path.format(render_layer=layer_name)
-                job_data['OutputFilename0'] = output
+                    # setting job data
+                    job_data = job_data.copy()
 
-                instance.set_data('deadlineJobData', value=job_data)
+                    start_frame = int(render_globals.startFrame.get())
+                    end_frame = int(render_globals.endFrame.get())
+                    frames = '%s-%s' % (start_frame, end_frame)
+                    instance.set_data('deadlineFrames', value=frames)
 
-                # adding ftrack data to activate processing
-                instance.set_data('ftrackComponents', value={})
-                instance.set_data('ftrackAssetType', value='img')
+                    output = path.format(render_layer=layer_name)
+                    job_data['OutputFilename0'] = output
 
-        pm.general.refresh(suspend=False)
-        pm.system.undoInfo(closeChunk=True)
-        pm.system.undo()
+                    instance.set_data('deadlineJobData', value=job_data)
+
+                    # adding ftrack data to activate processing
+                    instance.set_data('ftrackComponents', value={})
+                    instance.set_data('ftrackAssetType', value='img')
+        except:
+            self.log.info(traceback.format_exc)
+
+        pymel.core.general.isolateSelect(panel, state=0)
+
+        if not modified:
+            maya.cmds.file(s=True)
