@@ -21,35 +21,6 @@ class SelectDeadlineRenderlayers(pyblish.api.Selector):
         render_globals = pymel.core.PyNode('defaultRenderGlobals')
         start_frame = render_globals.startFrame.get()
 
-        paths = [str(pymel.core.system.Workspace.getPath().expand())]
-        try:
-            paths.append(str(pymel.core.system.Workspace.fileRules['images']))
-        except:
-            pass
-
-        output_path = os.path.join(*paths)
-        tmp = pymel.core.rendering.renderSettings(firstImageName=True)[0]
-        paths.append(str(tmp))
-
-        path = os.path.join(*paths)
-
-        padding = render_globals.extensionPadding.get()
-        firstFrame = int(render_globals.startFrame.get())
-        stringFrame = str(firstFrame).zfill(padding)
-        if stringFrame in os.path.basename(path):
-            tmp = '#' * padding
-            basename = os.path.basename(path).replace(stringFrame, tmp)
-            dirname = os.path.dirname(path)
-            path = os.path.join(dirname, basename)
-
-        layer = pymel.core.nodetypes.RenderLayer.currentLayer()
-        if layer.name() == 'defaultRenderLayer':
-            layer_name = 'masterLayer'
-        else:
-            layer_name = layer.name()
-
-        path = path.replace(layer_name, '{render_layer}')
-
         # getting job data
         job_data = {}
         if context.has_data('deadlineJobData'):
@@ -110,8 +81,31 @@ class SelectDeadlineRenderlayers(pyblish.api.Selector):
                     frames = '%s-%s' % (start_frame, end_frame)
                     instance.set_data('deadlineFrames', value=frames)
 
-                    output = path.format(render_layer=layer_name)
-                    job_data['OutputFilename0'] = output
+                    paths = [str(pymel.core.system.Workspace.getPath().expand())]
+                    try:
+                        paths.append(str(pymel.core.system.Workspace.fileRules['images']))
+                    except:
+                        pass
+
+                    output_path = os.path.join(*paths)
+                    tmp = pymel.core.rendering.renderSettings(firstImageName=True)[0]
+                    paths.append(str(tmp))
+
+                    path = os.path.join(*paths)
+
+                    padding = render_globals.extensionPadding.get()
+                    firstFrame = int(render_globals.startFrame.get())
+                    stringFrame = str(firstFrame).zfill(padding)
+                    if stringFrame in os.path.basename(path):
+                        tmp = '#' * padding
+                        basename = os.path.basename(path).replace(stringFrame, tmp)
+                        dirname = os.path.dirname(path)
+                        path = os.path.join(dirname, basename)
+
+                    if layer.name() == 'defaultRenderLayer':
+                        path = path.replace('defaultRenderLayer', layer_name)
+
+                    job_data['OutputFilename0'] = path
 
                     instance.set_data('deadlineJobData', value=job_data)
 

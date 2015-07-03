@@ -69,7 +69,8 @@ class ConformDeadline(pyblish.api.Conformer):
             data += '%s=%s\n' % (entry, job_data[entry])
 
         current_dir = tempfile.gettempdir()
-        job_path = os.path.join(current_dir, job_data['Name'] + '.job.txt')
+        filename = job_data['Name'].replace(':', '_') + '.job.txt'
+        job_path = os.path.join(current_dir, filename)
 
         with open(job_path, 'w') as outfile:
             outfile.write(data)
@@ -87,8 +88,8 @@ class ConformDeadline(pyblish.api.Conformer):
             data += '%s=%s\n' % (entry, plugin_data[entry])
 
         current_dir = tempfile.gettempdir()
-        plugin_path = os.path.join(current_dir,
-                                   job_data['Name'] + '.plugin.txt')
+        filename = job_data['Name'].replace(':', '_') + '.plugin.txt'
+        plugin_path = os.path.join(current_dir, filename)
 
         with open(plugin_path, 'w') as outfile:
             outfile.write(data)
