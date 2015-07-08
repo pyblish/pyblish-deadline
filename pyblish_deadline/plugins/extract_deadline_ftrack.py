@@ -32,10 +32,10 @@ class ExtractDeadlineFtrack(pyblish.api.Extractor):
         task_name = ftrack_data['Task']['name']
         task_id = ftrack_data['Task']['id']
 
-        asset_name = ftrack_data['Asset']['name']
-        asset_id = ftrack_data['Asset']['id']
+        asset_name = instance.data('ftrackAsset')['name']
+        asset_id = instance.data('ftrackAsset')['id']
 
-        version_id = ftrack_data['AssetVersion']['id']
+        version_id = instance.data('ftrackAssetVersion')['id']
         version_used_id = ''
 
         if instance.has_data('ftrackVersionUsedID'):
@@ -46,7 +46,10 @@ class ExtractDeadlineFtrack(pyblish.api.Extractor):
 
         component_name = 'main'
         if instance.has_data('ftrackComponents'):
-            component_name = instance.data('ftrackComponents').keys()[0]
+            try:
+                component_name = instance.data('ftrackComponents').keys()[0]
+            except:
+                pass
 
         # setting extra info
         extra_info = []

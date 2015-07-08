@@ -70,3 +70,7 @@ class SelectDeadlineWriteNodes(pyblish.api.Selector):
 
 
                 instance.set_data('deadlinePluginData', value=plugin_data)
+
+                # adding ftrack data to activate processing
+                instance.set_data('ftrackComponents', value={})
+                instance.set_data('ftrackAssetType', value='img')
