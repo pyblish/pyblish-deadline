@@ -46,8 +46,12 @@ class SelectDeadlineRenderlayers(pyblish.api.Selector):
 
         # turn display off
         pymel.core.general.select(clear=True)
-        panel = pymel.core.getPanel(withFocus=True)
-        pymel.core.general.isolateSelect(panel, state=1)
+
+        for p in pymel.core.windows.getPanel(all=True):
+            if pymel.core.windows.getPanel(typeOf=p.name()) == 'modelPanel':
+                pymel.core.general.isolateSelect(p, state=1)
+
+        current_layer = pymel.core.nodetypes.RenderLayer.currentLayer()
 
         try:
             for layer in pymel.core.ls(type='renderLayer'):
@@ -115,7 +119,11 @@ class SelectDeadlineRenderlayers(pyblish.api.Selector):
         except:
             self.log.info(traceback.format_exc)
 
-        pymel.core.general.isolateSelect(panel, state=0)
+        for p in pymel.core.windows.getPanel(all=True):
+            if pymel.core.windows.getPanel(typeOf=p.name()) == 'modelPanel':
+                pymel.core.general.isolateSelect(p, state=0)
+
+        current_layer.setCurrent()
 
         if not modified:
             maya.cmds.file(s=True)
