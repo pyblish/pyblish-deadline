@@ -41,9 +41,6 @@ class SelectDeadlineRenderlayers(pyblish.api.Selector):
         if drg.currentRenderer.get() == 'arnold':
             plugin_data['Animation'] = 1
 
-        # storing modified state
-        modified = maya.cmds.file(q=True, mf=True)
-
         # turn display off
         pymel.core.general.select(clear=True)
 
@@ -124,6 +121,3 @@ class SelectDeadlineRenderlayers(pyblish.api.Selector):
                 pymel.core.general.isolateSelect(p, state=0)
 
         current_layer.setCurrent()
-
-        if not modified:
-            maya.cmds.file(s=True)
