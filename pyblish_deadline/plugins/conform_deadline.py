@@ -7,15 +7,18 @@ import pyblish.api
 
 
 @pyblish.api.log
-class ConformDeadline(pyblish.api.Conformer):
+class IntegrateDeadline(pyblish.api.Integrator):
 
-    families = ['deadline.render']
-    hosts = ['*']
     label = 'Send to Deadline'
 
     def process(self, context, instance):
 
-        job_data = instance.data('deadlineJobData')
+        # skipping instance if data is missing
+        if not instance.has_data('deadlineData'):
+            self.log.info('No deadlineData present. Skipping this instance')
+            return
+
+        job_data = instance.data('deadlineData')['job']
 
         # getting input
         scene_file = context.data('currentFile')
@@ -33,7 +36,8 @@ class ConformDeadline(pyblish.api.Conformer):
 
         job_data['UserName'] = getpass.getuser()
 
-        job_data['Frames'] = instance.data('deadlineFrames')
+        if instance.has_data('deadlineFrames'):
+            job_data['Frames'] = instance.data('deadlineFrames')
 
         if pyblish.api.current_host() == 'maya':
             job_data['Plugin'] = 'MayaBatch'
@@ -78,7 +82,7 @@ class ConformDeadline(pyblish.api.Conformer):
         self.log.info('job data:\n\n%s' % data)
 
         # getting plugin data
-        plugin_data = instance.data('deadlinePluginData')
+        plugin_data = instance.data('deadlineData')['plugin']
 
         plugin_data['SceneFile'] = scene_file
 

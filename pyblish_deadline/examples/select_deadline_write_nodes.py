@@ -5,12 +5,8 @@ import pyblish.api
 
 
 @pyblish.api.log
-class SelectDeadlineWriteNodes(pyblish.api.Selector):
+class CollectDeadlineWriteNodes(pyblish.api.Collector):
     """Selects all write nodes"""
-
-    hosts = ['nuke']
-    version = (0, 1, 0)
-    label = 'Select Write Nodes'
 
     def process(self, context):
 
@@ -31,8 +27,8 @@ class SelectDeadlineWriteNodes(pyblish.api.Selector):
 
                 # setting job data
                 job_data = {}
-                if instance.has_data('deadlineJobData'):
-                    job_data = instance.data('deadlineJobData').copy()
+                if instance.has_data('deadlineData'):
+                    job_data = instance.data('deadlineData')['job'].copy()
 
                 # output_file = os.path.basename(output)
                 output_file = output
@@ -45,7 +41,7 @@ class SelectDeadlineWriteNodes(pyblish.api.Selector):
 
                 job_data['OutputFilename0'] = output_file
 
-                instance.set_data('deadlineJobData', value=job_data)
+                #instance.set_data('deadlineJobData', value=job_data)
 
                 # frame range
                 start_frame = int(nuke.root()['first_frame'].getValue())
@@ -61,7 +57,9 @@ class SelectDeadlineWriteNodes(pyblish.api.Selector):
                 plugin_data = plugin_data.copy()
                 plugin_data['WriteNode'] = node.name()
 
-                instance.set_data('deadlinePluginData', value=plugin_data)
+                #instance.set_data('deadlinePluginData', value=plugin_data)
+                data = {'job': job_data, 'plugin': plugin_data}
+                instance.set_data('deadlineData', value=data)
 
                 # adding ftrack data to activate processing
                 instance.set_data('ftrackComponents', value={})
