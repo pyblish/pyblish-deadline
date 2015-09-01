@@ -18,8 +18,8 @@ class ExtractDeadlineFtrack(pyblish.api.Extractor):
 
         # getting job data
         job_data = {}
-        if instance.has_data('deadlineJobData'):
-            job_data = instance.data('deadlineJobData').copy()
+        if instance.has_data('deadlineData'):
+            job_data = instance.data('deadlineData')['job'].copy()
 
         # getting data
         username = getpass.getuser()
@@ -32,10 +32,10 @@ class ExtractDeadlineFtrack(pyblish.api.Extractor):
         task_name = ftrack_data['Task']['name']
         task_id = ftrack_data['Task']['id']
 
-        asset_name = ftrack_data['Asset']['name']
-        asset_id = ftrack_data['Asset']['id']
+        asset_name = instance.data('ftrackAsset')['name']
+        asset_id = instance.data('ftrackAsset')['id']
 
-        version_id = ftrack_data['AssetVersion']['id']
+        version_id = instance.data('ftrackAssetVersion')['id']
         version_used_id = ''
 
         if instance.has_data('ftrackVersionUsedID'):
@@ -46,7 +46,10 @@ class ExtractDeadlineFtrack(pyblish.api.Extractor):
 
         component_name = None
         if instance.has_data('ftrackComponents'):
-            component_name = instance.data('ftrackComponents').keys()[0]
+            try:
+                component_name = instance.data('ftrackComponents').keys()[0]
+            except:
+                pass
 
         # setting extra info
         extra_info = []
@@ -79,4 +82,6 @@ class ExtractDeadlineFtrack(pyblish.api.Extractor):
 
         job_data['ExtraInfoKeyValue'] = extra_info_key_value
 
-        instance.set_data('deadlineJobData', value=job_data)
+        data = instance.data('deadlineData')
+        data['job'] = job_data
+        instance.set_data('deadlineData', value=data)
