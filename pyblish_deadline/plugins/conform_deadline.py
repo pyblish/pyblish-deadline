@@ -2,11 +2,21 @@ import os
 import getpass
 import subprocess
 import tempfile
+import json
+import inspect
+import sys
 
 import pyblish.api
 
+# adding vendor
+requests_path = os.path.dirname(inspect.getfile(inspect.currentframe()))
+requests_path = os.path.dirname(os.path.dirname(requests_path))
+requests_path = os.path.join(requests_path, 'vendor', 'requests')
+sys.path.append(requests_path)
 
-@pyblish.api.log
+import requests
+
+
 class IntegrateDeadline(pyblish.api.Integrator):
 
     label = 'Send to Deadline'
@@ -103,11 +113,27 @@ class IntegrateDeadline(pyblish.api.Integrator):
         # submitting job
         args = [job_path, plugin_path]
 
-        self.log.info(self.CallDeadlineCommand(args))
+        try:
+            self.log.info(self.CallDeadlineCommand(args))
+        except:
+            self.log.warning('No local Deadline found!')
 
-        # deleting temporary files
-        os.remove(job_path)
-        os.remove(plugin_path)
+            # deleting temporary files
+            os.remove(job_path)
+            os.remove(plugin_path)
+
+        d = os.path.dirname
+        config = d(d(d(inspect.getfile(inspect.currentframe()))))
+        config = os.path.join(config, 'config.json')
+
+        data = ''
+        with open(config) as f:
+            data = json.load(f)
+            f.close()
+        url = '%s:%s/api/jobs' % (data['address'], data['port'])
+
+        payload = {'JobInfo': job_data, 'PluginInfo': plugin_data, 'AuxFiles': []}
+        self.log.info(requests.post(url, auth=(data['username'], data['password']), data=json.dumps(payload)))
 
     def CallDeadlineCommand(self, arguments, hideWindow=True):
         # On OSX, we look for the DEADLINE_PATH file. On other platforms, we use the environment variable.
