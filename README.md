@@ -1,5 +1,29 @@
 # pyblish-deadline
 
+## Setup
+The repository path needs to be in the ```PYTHONPATH``` environment variable.
+
+Test with ```import pyblish_deadline```
+
+**Remote Submission**
+
+Deadline has the ability to submit job from remote locations. To use this feature, you need to enable the web service; http://docs.thinkboxsoftware.com/products/deadline/7.1/1_User%20Manual/manual/web-service.html
+
+To setup pyblish-deadline for remote submission, you need to create a ```config.json``` file next to ```check_port.py```. The ```config.json``` needs to have the following structure:
+```
+{"address":"URL","port":"PORT NUMBER","username":"USERNAME","password":"PASSWORD"}
+```
+The parameters look something like this:
+```
+URL = http://43.2.33.415
+PORT NUMBER = 8080
+USERNAME = myusername
+PASSWORD = mypassword
+```
+
+Run ```check_port.py``` to check that everything is setup correctly.
+
+## Usage
 To use this extension you need to collect and inject data into the instance you want to publish.
 
 The data member you need to create is "deadlineData". "deadlineData" is a dictionary containing two items; "job" and "plugin". Each of these has dictionaries as values.
@@ -54,21 +78,3 @@ plugin = {'NukeX': False, 'WriteNode': 'Write1', 'Version': '9.0', 'EnforceRende
 **Event Plugins**
 
 To utilize the event plugins in Deadline, you will need to append additional data to the ```job``` data. You can find various examples in ```pyblish_deadline/examples```.
-
-**Remote Submission**
-
-Deadline has the ability to submit job from remote locations. To use this feature, you need to enable the web service; http://docs.thinkboxsoftware.com/products/deadline/7.1/1_User%20Manual/manual/web-service.html
-
-To setup pyblish-deadline for remote submission, you need to create a ```config.json``` file next to ```check_port.py```. The ```config.json``` needs to have the following structure:
-```
-{"address":"URL","port":"PORT NUMBER","username":"USERNAME","password":"PASSWORD"}
-```
-The parameters look something like this:
-```
-URL = http://43.2.33.415
-PORT NUMBER = 8080
-USERNAME = myusername
-PASSWORD = mypassword
-```
-
-Run ```check_port.py``` to check that everything is setup correctly.
