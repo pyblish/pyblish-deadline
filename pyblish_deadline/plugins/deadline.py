@@ -12,22 +12,41 @@ import pyblish.api
 from pyblish_deadline.vendor import requests
 
 
+class PassthroughSubmission(pyblish.api.Integrator):
+
+    label = 'Deadline Passthrough'
+    DeadlineSubmission = True
+
+    def process(self, instance):
+
+        pass
+
+
 class IntegrateDeadline(pyblish.api.Integrator):
 
     label = 'Deadline Submission'
     optional = True
+    order = PassthroughSubmission.order + 0.1
 
     def process(self, context):
-
 
         instances = {}
         instances_order = []
         instances_no_order = []
-        for instance in context:
+
+        for item in context.data('results'):
+
+            # skipping instances that aren't enabled
+            try:
+                item['plugin'].DeadlineSubmission
+                instance = item['instance']
+            except:
+                continue
 
             # skipping instance if data is missing
             if not instance.has_data('deadlineData'):
-                self.log.info('No deadlineData present. Skipping "%s"' % instance)
+                msg = 'No deadlineData present. Skipping "%s"' % instance
+                self.log.info(msg)
                 continue
 
             if 'order' in instance.data('deadlineData'):
@@ -229,84 +248,3 @@ class IntegrateDeadline(pyblish.api.Integrator):
         output = proc.stdout.read()
 
         return output
-
-"""
-class IntegrateDependencies(pyblish.api.Integrator):
-
-    label = 'Deadline Dependencies'
-    optional = True
-    order = IntegrateDeadline.order + 0.1
-
-    def process(self, context):
-
-        items = {}
-        items_order = []
-        for item in context:
-
-            if not item.has_data('deadlineData'):
-                self.log.info('No deadlineData present. Skipping this instance')
-                continue
-            if not item.has_data('jobId'):
-                self.log.info('No jobId present. Skipping this instance')
-                continue
-
-            order = item.data('deadlineData')['order']
-            items_order.append(order)
-            if order in items:
-                items[order].append(item)
-            else:
-                items[order] = [item]
-
-        items_order = list(set(items_order))
-        items_order.sort()
-        items_order = list(reversed(items_order))
-        for count in range(0, len(items_order) - 1):
-            for item in items[items_order[count]]:
-                args = ['SetJobSetting', item.data('jobId'), 'JobDependency0', '5631f58d65693226c4e330ed']
-                self.log.info(self.CallDeadlineCommand(args))
-            self.log.info('%s dependent on:' % items[items_order[count]])
-            self.log.info(items[items_order[count + 1]])
-
-        #assert False, 'stop'
-
-    def CallDeadlineCommand(self, arguments, hideWindow=True):
-        # On OSX, we look for the DEADLINE_PATH file. On other platforms, we use the environment variable.
-        if os.path.exists("/Users/Shared/Thinkbox/DEADLINE_PATH"):
-            with open("/Users/Shared/Thinkbox/DEADLINE_PATH") as f: deadlineBin = f.read().strip()
-            deadlineCommand = deadlineBin + "/deadlinecommand"
-        else:
-            deadlineBin = os.environ['DEADLINE_PATH']
-            if os.name == 'nt':
-                deadlineCommand = deadlineBin + "\\deadlinecommand.exe"
-            else:
-                deadlineCommand = deadlineBin + "/deadlinecommand"
-
-        startupinfo = None
-        if hideWindow and os.name == 'nt' and hasattr(subprocess,
-                                                      'STARTF_USESHOWWINDOW'):
-            startupinfo = subprocess.STARTUPINFO()
-            startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
-
-        environment = {}
-        for key in os.environ.keys():
-            environment[key] = str(os.environ[key])
-
-        # Need to set the PATH, cuz windows seems to load DLLs from the PATH earlier that cwd....
-        if os.name == 'nt':
-            environment['PATH'] = str(deadlineBin + os.pathsep + os.environ['PATH'])
-
-        arguments.insert(0, deadlineCommand)
-
-        # Specifying PIPE for all handles to workaround a Python bug on Windows.
-        # The unused handles are then closed immediatley afterwards.
-        proc = subprocess.Popen(arguments, cwd=deadlineBin,
-                                stdin=subprocess.PIPE, stdout=subprocess.PIPE,
-                                stderr=subprocess.PIPE, startupinfo=startupinfo,
-                                env=environment)
-        proc.stdin.close()
-        proc.stderr.close()
-
-        output = proc.stdout.read()
-
-        return output
-"""
