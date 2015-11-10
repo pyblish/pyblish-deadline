@@ -1,5 +1,3 @@
-import os
-
 import nuke
 import pyblish.api
 
@@ -25,7 +23,6 @@ class SelectDeadlineWriteNodes(pyblish.api.Selector):
         for node in nuke.allNodes():
             if node.Class() == 'Write' and not node['disable'].getValue():
                 instance = context.create_instance(name=node.name())
-                instance.add(node)
                 instance.set_data('family', value='deadline.render')
 
                 output = node['file'].getValue()
@@ -61,16 +58,5 @@ class SelectDeadlineWriteNodes(pyblish.api.Selector):
                 # setting plugin data
                 plugin_data = plugin_data.copy()
                 plugin_data['WriteNode'] = node.name()
-
-                try:
-                    components = {node['fcompname'].getValue(): {}}
-                    instance.set_data('ftrackComponents', value=components)
-                except:
-                    pass
-
-
                 instance.set_data('deadlinePluginData', value=plugin_data)
-
-                # adding ftrack data to activate processing
-                instance.set_data('ftrackComponents', value={})
-                instance.set_data('ftrackAssetType', value='img')
+                instance.add(node)
