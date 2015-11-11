@@ -1,1 +1,4 @@
 *.pyc
+._*
+pyblish_deadline/plugins/config.json
+config.json

@@ -18,8 +18,8 @@ class ExtractDeadlineFtrack(pyblish.api.Extractor):
 
         # getting job data
         job_data = {}
-        if instance.has_data('deadlineJobData'):
-            job_data = instance.data('deadlineJobData').copy()
+        if instance.has_data('deadlineData'):
+            job_data = instance.data('deadlineData')['job'].copy()
 
         # getting data
         username = getpass.getuser()
@@ -82,4 +82,6 @@ class ExtractDeadlineFtrack(pyblish.api.Extractor):
 
         job_data['ExtraInfoKeyValue'] = extra_info_key_value
 
-        instance.set_data('deadlineJobData', value=job_data)
+        data = instance.data('deadlineData')
+        data['job'] = job_data
+        instance.set_data('deadlineData', value=data)
