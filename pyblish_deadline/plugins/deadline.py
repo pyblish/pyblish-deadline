@@ -4,7 +4,6 @@ import subprocess
 import tempfile
 import json
 import inspect
-import sys
 import traceback
 import re
 
@@ -103,9 +102,11 @@ class IntegrateDeadline(pyblish.api.Integrator):
             if 'order' in instance.data('deadlineData'):
                 order = instance.data('deadlineData')['order']
                 if instances_order.index(order) != 0:
-                    dependencies = instances[instances_order[instances_order.index(order) - 1]]
+                    index = instances_order.index(order) - 1
+                    dependencies = instances[instances_order[index]]
                     for count in range(0, len(dependencies)):
-                        job_data['JobDependency%s' % count] = dependencies[count].data('jobId')
+                        name = 'JobDependency%s' % count
+                        job_data[name] = dependencies[count].data('jobId')
 
             # writing job data
             data = ''
@@ -119,7 +120,8 @@ class IntegrateDeadline(pyblish.api.Integrator):
             if 'DraftTemplates' in job_data:
                 for t in job_data['DraftTemplates']:
                     index = job_data['DraftTemplates'].index(t)
-                    job_data['ExtraInfoKeyValue']['DraftTemplate%s' % index] = t
+                    name = 'DraftTemplate%s' % index
+                    job_data['ExtraInfoKeyValue'][name] = t
                 del job_data['DraftTemplates']
 
             if 'ExtraInfoKeyValue' in job_data:
@@ -146,7 +148,11 @@ class IntegrateDeadline(pyblish.api.Integrator):
             # getting plugin data
             plugin_data = instance.data('deadlineData')['plugin']
 
-            plugin_data['SceneFile'] = scene_file
+            if 'SceneFile' not in plugin_data:
+                plugin_data['SceneFile'] = scene_file
+            else:
+                if not plugin_data['SceneFile']:
+                    del plugin_data['SceneFile']
 
             # writing plugin data
             data = ''
@@ -165,6 +171,9 @@ class IntegrateDeadline(pyblish.api.Integrator):
             # submitting job
             args = [job_path, plugin_path]
 
+            if 'auxiliaryFiles' in instance.data['deadlineData']:
+                args.extend(instance.data('deadlineData')['auxiliaryFiles'])
+
             # submitting remotely
             success = True
             try:
@@ -178,8 +187,10 @@ class IntegrateDeadline(pyblish.api.Integrator):
                     f.close()
                 url = '%s:%s/api/jobs' % (data['address'], data['port'])
 
-                payload = {'JobInfo': job_data, 'PluginInfo': plugin_data, 'AuxFiles': []}
-                r = requests.post(url, auth=(data['username'], data['password']), data=json.dumps(payload))
+                payload = {'JobInfo': job_data, 'PluginInfo': plugin_data,
+                           'AuxFiles': []}
+                r = requests.post(url, auth=(data['username'],
+                                  data['password']), data=json.dumps(payload))
 
                 if r.status_code != 200:
                     success = False
@@ -187,13 +198,13 @@ class IntegrateDeadline(pyblish.api.Integrator):
                 success = False
             finally:
                 if success:
-                    self.log.info('Successfully submitted to remote repository.')
+                    msg = 'Successfully submitted to remote repository.'
+                    self.log.info(msg)
                     return
                 else:
                     self.log.info('Failed to submit to remote repository.')
 
-
-             # submitting locally
+            # submitting locally
             try:
                 result = self.CallDeadlineCommand(args)
 
@@ -209,10 +220,12 @@ class IntegrateDeadline(pyblish.api.Integrator):
             os.remove(plugin_path)
 
     def CallDeadlineCommand(self, arguments, hideWindow=True):
-        # On OSX, we look for the DEADLINE_PATH file. On other platforms, we use the environment variable.
+        # On OSX, we look for the DEADLINE_PATH file. On other platforms,
+        # we use the environment variable.
         if os.path.exists("/Users/Shared/Thinkbox/DEADLINE_PATH"):
-            with open("/Users/Shared/Thinkbox/DEADLINE_PATH") as f: deadlineBin = f.read().strip()
-            deadlineCommand = deadlineBin + "/deadlinecommand"
+            with open("/Users/Shared/Thinkbox/DEADLINE_PATH") as f:
+                deadlineBin = f.read().strip()
+                deadlineCommand = deadlineBin + "/deadlinecommand"
         else:
             deadlineBin = os.environ['DEADLINE_PATH']
             if os.name == 'nt':
@@ -230,17 +243,21 @@ class IntegrateDeadline(pyblish.api.Integrator):
         for key in os.environ.keys():
             environment[key] = str(os.environ[key])
 
-        # Need to set the PATH, cuz windows seems to load DLLs from the PATH earlier that cwd....
+        # Need to set the PATH, cuz windows seems to load DLLs from the PATH
+        # earlier that cwd....
         if os.name == 'nt':
-            environment['PATH'] = str(deadlineBin + os.pathsep + os.environ['PATH'])
+            path = str(deadlineBin + os.pathsep + os.environ['PATH'])
+            environment['PATH'] = path
 
         arguments.insert(0, deadlineCommand)
 
-        # Specifying PIPE for all handles to workaround a Python bug on Windows.
+        # Specifying PIPE for all handles to
+        # workaround a Python bug on Windows.
         # The unused handles are then closed immediatley afterwards.
         proc = subprocess.Popen(arguments, cwd=deadlineBin,
                                 stdin=subprocess.PIPE, stdout=subprocess.PIPE,
-                                stderr=subprocess.PIPE, startupinfo=startupinfo,
+                                stderr=subprocess.PIPE,
+                                startupinfo=startupinfo,
                                 env=environment)
         proc.stdin.close()
         proc.stderr.close()
