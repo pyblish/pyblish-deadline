@@ -26,7 +26,7 @@ Run ```check_port.py``` to check that everything is setup correctly.
 ## Usage
 To use this extension you need to collect and inject data into the instance you want to publish.
 
-The data member you need to create is ```deadlineData```. ```deadlineData``` is a dictionary containing three items; ```job```, ```plugin``` and ```order```. ```job``` and ```plugin``` has dictionaries as values. ```order``` is an integer.
+The data member you need to create is ```deadlineData```. ```deadlineData``` is a dictionary containing four items; ```job```, ```plugin```, ```auxiliaryFiles``` and ```order```. ```job``` and ```plugin``` has dictionaries as values, ```auxiliaryFiles``` is a list and ```order``` is an integer.
 
 **job**
 
@@ -82,6 +82,10 @@ This is an optional value to set. This determines dependencies between jobs. Bei
 In a publish with instances that has orders like; ```Write1.order = 1``` and ```Write2.order = 2```, ```Write2``` will be dependent on ```Write1``` as ```Write1``` has a lower order value.
 
 This works for multiple dependencies as well. So in the case of; ```Write1.order = 1```, ```Write2.order = 1``` and ```Write3.order = 2```, ```Write3``` will be dependent on ```Write1``` and ```Write2```.
+
+**auxiliaryFiles**
+
+You can optionally submit scene files with a job submission called auxiliary files. This is a list of file paths.
 
 **Event Plugins**
 
