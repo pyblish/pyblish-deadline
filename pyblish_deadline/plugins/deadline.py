@@ -11,21 +11,10 @@ import pyblish.api
 from pyblish_deadline.vendor import requests
 
 
-class PassthroughSubmission(pyblish.api.Integrator):
-
-    label = 'Deadline Passthrough'
-    DeadlineSubmission = True
-
-    def process(self, instance):
-
-        pass
-
-
 class IntegrateDeadline(pyblish.api.Integrator):
 
     label = 'Deadline Submission'
     optional = True
-    order = PassthroughSubmission.order + 0.1
 
     def process(self, context):
 
@@ -33,13 +22,9 @@ class IntegrateDeadline(pyblish.api.Integrator):
         instances_order = []
         instances_no_order = []
 
-        for item in context.data('results'):
+        for instance in context:
 
-            # skipping instances that aren't enabled
-            try:
-                item['plugin'].DeadlineSubmission
-                instance = item['instance']
-            except:
+            if not instance.data.get("publish", True):
                 continue
 
             # skipping instance if data is missing
