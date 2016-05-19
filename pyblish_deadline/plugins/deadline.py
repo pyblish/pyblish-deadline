@@ -8,7 +8,6 @@ import traceback
 import re
 
 import pyblish.api
-from pyblish_deadline.vendor import requests
 
 
 class IntegrateDeadline(pyblish.api.Integrator):
@@ -157,11 +156,17 @@ class IntegrateDeadline(pyblish.api.Integrator):
             args = [job_path, plugin_path]
 
             if 'auxiliaryFiles' in instance.data['deadlineData']:
-                args.extend(instance.data('deadlineData')['auxiliaryFiles'])
+                aux_files = instance.data('deadlineData')['auxiliaryFiles']
+                if isinstance(aux_files, list):
+                    args.extend(aux_files)
+                else:
+                    args.append(aux_files)
 
             # submitting remotely
             success = True
             try:
+                from pyblish_deadline.vendor import requests
+
                 d = os.path.dirname
                 config = d(d(d(inspect.getfile(inspect.currentframe()))))
                 config = os.path.join(config, 'config.json')
@@ -179,7 +184,8 @@ class IntegrateDeadline(pyblish.api.Integrator):
 
                 if r.status_code != 200:
                     success = False
-            except:
+            except Exception as e:
+                self.log.warning(e)
                 success = False
             finally:
                 if success:
