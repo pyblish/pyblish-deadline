@@ -92,11 +92,12 @@ class IntegrateDeadline(pyblish.api.Integrator):
             if instance.has_data('deadlineFrames'):
                 job_data['Frames'] = instance.data('deadlineFrames')
 
-            if pyblish.api.current_host() == 'maya':
-                job_data['Plugin'] = 'MayaBatch'
+            if not job_data['Plugin']:
+                if pyblish.api.current_host() == 'maya':
+                    job_data['Plugin'] = 'MayaBatch'
 
-            if pyblish.api.current_host() == 'nuke':
-                job_data['Plugin'] = 'Nuke'
+                if pyblish.api.current_host() == 'nuke':
+                    job_data['Plugin'] = 'Nuke'
 
             # setting up dependencies
             if 'order' in instance.data('deadlineData'):
