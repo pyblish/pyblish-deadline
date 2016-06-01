@@ -92,7 +92,7 @@ class IntegrateDeadline(pyblish.api.Integrator):
             if instance.has_data('deadlineFrames'):
                 job_data['Frames'] = instance.data('deadlineFrames')
 
-            if not job_data['Plugin']:
+            if not job_data.get('Plugin'):
                 if pyblish.api.current_host() == 'maya':
                     job_data['Plugin'] = 'MayaBatch'
 
