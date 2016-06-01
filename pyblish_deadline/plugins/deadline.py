@@ -8,24 +8,12 @@ import traceback
 import re
 
 import pyblish.api
-from pyblish_deadline.vendor import requests
-
-
-class PassthroughSubmission(pyblish.api.Integrator):
-
-    label = 'Deadline Passthrough'
-    DeadlineSubmission = True
-
-    def process(self, instance):
-
-        pass
 
 
 class IntegrateDeadline(pyblish.api.Integrator):
 
     label = 'Deadline Submission'
     optional = True
-    order = PassthroughSubmission.order + 0.1
 
     def process(self, context):
 
@@ -33,13 +21,9 @@ class IntegrateDeadline(pyblish.api.Integrator):
         instances_order = []
         instances_no_order = []
 
-        for item in context.data('results'):
+        for instance in context:
 
-            # skipping instances that aren't enabled
-            try:
-                item['plugin'].DeadlineSubmission
-                instance = item['instance']
-            except:
+            if not instance.data.get("publish", True):
                 continue
 
             # skipping instance if data is missing
@@ -172,11 +156,17 @@ class IntegrateDeadline(pyblish.api.Integrator):
             args = [job_path, plugin_path]
 
             if 'auxiliaryFiles' in instance.data['deadlineData']:
-                args.extend(instance.data('deadlineData')['auxiliaryFiles'])
+                aux_files = instance.data('deadlineData')['auxiliaryFiles']
+                if isinstance(aux_files, list):
+                    args.extend(aux_files)
+                else:
+                    args.append(aux_files)
 
             # submitting remotely
             success = True
             try:
+                from pyblish_deadline.vendor import requests
+
                 d = os.path.dirname
                 config = d(d(d(inspect.getfile(inspect.currentframe()))))
                 config = os.path.join(config, 'config.json')
@@ -194,7 +184,8 @@ class IntegrateDeadline(pyblish.api.Integrator):
 
                 if r.status_code != 200:
                     success = False
-            except:
+            except Exception as e:
+                self.log.warning(e)
                 success = False
             finally:
                 if success:
