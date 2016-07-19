@@ -1,0 +1,243 @@
+[Enabled]
+Type=boolean
+Category=Options
+CategoryOrder=0
+CategoryIndex=0
+Label=Enabled
+Default=false
+Description=If this event plugin is enabled.
+
+[PythonSearchPaths]
+Type=MultiLineMultiFolder
+Label=Additional Python Search Paths
+Category=Options
+CategoryOrder=0
+CategoryIndex=1
+Default=
+Description=The list of paths to append to the PYTHONPATH environment variable.  This allows the Python job to find custom modules in non-standard locations.
+
+[LoggingLevel]
+Type=Enum
+Label=Logging Level
+Category=Options
+CategoryOrder=0
+CategoryIndex=2
+Items=DEBUG;INFO;WARNING;ERROR
+Default=DEBUG
+Description=Logging level where printing will start.
+
+[OnJobSubmittedPaths]
+Type=MultiLineMultiFolder
+Label=On Job Submitted Plugins Paths
+Category=Job Plugins
+CategoryOrder=1
+CategoryIndex=1
+Default=
+Description=The list of paths to append to the PYBLISHPLUGINPATH environment variable, when a job is submitted.
+
+[OnJobStartedPaths]
+Type=MultiLineMultiFolder
+Label=On Job Started Plugins Paths
+Category=Job Plugins
+CategoryOrder=1
+CategoryIndex=2
+Default=
+Description=The list of paths to append to the PYBLISHPLUGINPATH environment variable, when a job is started.
+
+[OnJobFinishedPaths]
+Type=MultiLineMultiFolder
+Label=On Job Finished Plugins Paths
+Category=Job Plugins
+CategoryOrder=1
+CategoryIndex=3
+Default=
+Description=The list of paths to append to the PYBLISHPLUGINPATH environment variable, when a job is finished.
+
+[OnJobRequeuedPaths]
+Type=MultiLineMultiFolder
+Label=On Job Requeued Plugins Paths
+Category=Job Plugins
+CategoryOrder=1
+CategoryIndex=4
+Default=
+Description=The list of paths to append to the PYBLISHPLUGINPATH environment variable, when a job is requeued.
+
+[OnJobFailedPaths]
+Type=MultiLineMultiFolder
+Label=On Job Failed Plugins Paths
+Category=Job Plugins
+CategoryOrder=1
+CategoryIndex=5
+Default=
+Description=The list of paths to append to the PYBLISHPLUGINPATH environment variable, when a job is failed.
+
+[OnJobSuspendedPaths]
+Type=MultiLineMultiFolder
+Label=On Job Suspended Plugins Paths
+Category=Job Plugins
+CategoryOrder=1
+CategoryIndex=6
+Default=
+Description=The list of paths to append to the PYBLISHPLUGINPATH environment variable, when a job is suspended.
+
+[OnJobResumedPaths]
+Type=MultiLineMultiFolder
+Label=On Job Resumed Plugins Paths
+Category=Job Plugins
+CategoryOrder=1
+CategoryIndex=7
+Default=
+Description=The list of paths to append to the PYBLISHPLUGINPATH environment variable, when a job is resumed.
+
+[OnJobPendedPaths]
+Type=MultiLineMultiFolder
+Label=On Job Pended Plugins Paths
+Category=Job Plugins
+CategoryOrder=1
+CategoryIndex=8
+Default=
+Description=The list of paths to append to the PYBLISHPLUGINPATH environment variable, when a job is pended.
+
+[OnJobReleasedPaths]
+Type=MultiLineMultiFolder
+Label=On Job Released Plugins Paths
+Category=Job Plugins
+CategoryOrder=1
+CategoryIndex=9
+Default=
+Description=The list of paths to append to the PYBLISHPLUGINPATH environment variable, when a job is released.
+
+[OnJobDeletedPaths]
+Type=MultiLineMultiFolder
+Label=On Job Deleted Plugins Paths
+Category=Job Plugins
+CategoryOrder=1
+CategoryIndex=10
+Default=
+Description=The list of paths to append to the PYBLISHPLUGINPATH environment variable, when a job is deleted.
+
+[OnJobErrorPaths]
+Type=MultiLineMultiFolder
+Label=On Job Error Plugins Paths
+Category=Job Plugins
+CategoryOrder=1
+CategoryIndex=11
+Default=
+Description=The list of paths to append to the PYBLISHPLUGINPATH environment variable, when a job errors.
+
+[OnJobPurgedPaths]
+Type=MultiLineMultiFolder
+Label=On Job Purged Plugins Paths
+Category=Job Plugins
+CategoryOrder=1
+CategoryIndex=12
+Default=
+Description=The list of paths to append to the PYBLISHPLUGINPATH environment variable, when a job is purged.
+
+[OnHouseCleaningPaths]
+Type=MultiLineMultiFolder
+Label=On House Cleaning Plugins Paths
+Category=Repository Plugins
+CategoryOrder=2
+CategoryIndex=0
+Default=
+Description=The list of paths to append to the PYBLISHPLUGINPATH environment variable, when house cleaning.
+
+[OnRepositoryRepairPaths]
+Type=MultiLineMultiFolder
+Label=On Repository Repair Plugins Paths
+Category=Repository Plugins
+CategoryOrder=2
+CategoryIndex=1
+Default=
+Description=The list of paths to append to the PYBLISHPLUGINPATH environment variable, when repository repairing.
+
+[OnSlaveStartedPaths]
+Type=MultiLineMultiFolder
+Label=On Slave Started Plugins Paths
+Category=Slave Plugins
+CategoryOrder=3
+CategoryIndex=0
+Default=
+Description=The list of paths to append to the PYBLISHPLUGINPATH environment variable, when a slave is started.
+
+[OnSlaveStoppedPaths]
+Type=MultiLineMultiFolder
+Label=On Slave Stopped Plugins Paths
+Category=Slave Plugins
+CategoryOrder=3
+CategoryIndex=1
+Default=
+Description=The list of paths to append to the PYBLISHPLUGINPATH environment variable, when a slave is stopped.
+
+[OnSlaveIdlePaths]
+Type=MultiLineMultiFolder
+Label=On Slave Idle Plugins Paths
+Category=Slave Plugins
+CategoryOrder=3
+CategoryIndex=2
+Default=
+Description=The list of paths to append to the PYBLISHPLUGINPATH environment variable, when a slave is idle.
+
+[OnSlaveRenderingPaths]
+Type=MultiLineMultiFolder
+Label=On Slave Rendering Plugins Paths
+Category=Slave Plugins
+CategoryOrder=3
+CategoryIndex=3
+Default=
+Description=The list of paths to append to the PYBLISHPLUGINPATH environment variable, when a slave is rendering.
+
+[OnSlaveStartingJobPaths]
+Type=MultiLineMultiFolder
+Label=On Slave Starting Job Plugins Paths
+Category=Slave Plugins
+CategoryOrder=3
+CategoryIndex=4
+Default=
+Description=The list of paths to append to the PYBLISHPLUGINPATH environment variable, when a slave is starting a job.
+
+[OnSlaveStalledPaths]
+Type=MultiLineMultiFolder
+Label=On Slave Stalled Plugins Paths
+Category=Slave Plugins
+CategoryOrder=3
+CategoryIndex=5
+Default=
+Description=The list of paths to append to the PYBLISHPLUGINPATH environment variable, when a slave has stalled.
+
+[OnIdleShutdownPaths]
+Type=MultiLineMultiFolder
+Label=On Idle Shutdown Plugins Paths
+Category=Power Management Plugins
+CategoryOrder=4
+CategoryIndex=0
+Default=
+Description=The list of paths to append to the PYBLISHPLUGINPATH environment variable, when shutting down due to idling.
+
+[OnMachineStartupPaths]
+Type=MultiLineMultiFolder
+Label=On Machine Startup Plugins Paths
+Category=Power Management Plugins
+CategoryOrder=4
+CategoryIndex=1
+Default=
+Description=The list of paths to append to the PYBLISHPLUGINPATH environment variable, when a machine is starting up.
+
+[OnThermalShutdownPaths]
+Type=MultiLineMultiFolder
+Label=On Thermal Shutdown Plugins Paths
+Category=Power Management Plugins
+CategoryOrder=4
+CategoryIndex=2
+Default=
+Description=The list of paths to append to the PYBLISHPLUGINPATH environment variable, when shutting down due to thermal.
+
+[OnMachineRestartPaths]
+Type=MultiLineMultiFolder
+Label=On Machine Restart Plugins Paths
+Category=Power Management Plugins
+CategoryOrder=4
+CategoryIndex=3
+Default=
+Description=The list of paths to append to the PYBLISHPLUGINPATH environment variable, when a machine is restarting.
