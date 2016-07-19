@@ -1,18 +1,17 @@
 import os
-import getpass
 import subprocess
 import tempfile
-import json
-import inspect
 import traceback
 import re
+import uuid
+import json
 
 import pyblish.api
 
 
 class IntegrateDeadline(pyblish.api.Integrator):
 
-    label = 'Deadline Submission'
+    label = "Deadline Submission"
     optional = True
 
     def process(self, context):
@@ -26,14 +25,15 @@ class IntegrateDeadline(pyblish.api.Integrator):
             if not instance.data.get("publish", True):
                 continue
 
-            # skipping instance if data is missing
-            if not instance.has_data('deadlineData'):
-                msg = 'No deadlineData present. Skipping "%s"' % instance
+            # skipping instance if not part of the family
+            if "deadline" not in instance.data.get("families", []):
+                msg = "No \"deadline\" family assigned. "
+                msg += "Skipping \"%s\"." % instance
                 self.log.info(msg)
                 continue
 
-            if 'order' in instance.data('deadlineData'):
-                order = instance.data('deadlineData')['order']
+            if "order" in instance.data("deadlineData"):
+                order = instance.data("deadlineData")["order"]
                 instances_order.append(order)
                 if order in instances:
                     instances[order].append(instance)
@@ -55,154 +55,97 @@ class IntegrateDeadline(pyblish.api.Integrator):
 
         for instance in new_context:
 
-            job_data = instance.data('deadlineData')['job']
-
-            # getting input
-            scene_file = context.data('currentFile')
-
-            if context.has_data('deadlineInput'):
-                scene_file = context.data('deadlineInput')
-
-            name = os.path.basename(scene_file)
-            name = os.path.splitext(name)[0]
-            name += ' - ' + str(instance)
+            submission_id = uuid.uuid4()
 
             # getting job data
+            job_data = instance.data("deadlineData")["job"]
 
-            job_data['Name'] = name
+            data = json.dumps(instance.data)
+            if "ExtraInfoKeyValue" in job_data:
+                job_data["ExtraInfoKeyValue"]["PyblishInstanceData"] = data
+            else:
+                job_data["ExtraInfoKeyValue"] = {"PyblishInstanceData": data}
 
-            job_data['UserName'] = getpass.getuser()
-
-            if instance.has_data('deadlineFrames'):
-                job_data['Frames'] = instance.data('deadlineFrames')
-
-            if pyblish.api.current_host() == 'maya':
-                job_data['Plugin'] = 'MayaBatch'
-
-            if pyblish.api.current_host() == 'nuke':
-                job_data['Plugin'] = 'Nuke'
+            data = instance.context.data.copy()
+            del data["results"]
+            if "deadlineJob" in data:
+                del data["deadlineJob"]
+            data = json.dumps(data)
+            job_data["ExtraInfoKeyValue"]["PyblishContextData"] = data
 
             # setting up dependencies
-            if 'order' in instance.data('deadlineData'):
-                order = instance.data('deadlineData')['order']
+            if "order" in instance.data("deadlineData"):
+                order = instance.data("deadlineData")["order"]
                 if instances_order.index(order) != 0:
                     index = instances_order.index(order) - 1
                     dependencies = instances[instances_order[index]]
                     for count in range(0, len(dependencies)):
-                        name = 'JobDependency%s' % count
-                        job_data[name] = dependencies[count].data('jobId')
+                        name = "JobDependency%s" % count
+                        job_data[name] = dependencies[count].data("jobId")
 
             # writing job data
-            data = ''
+            data = ""
 
-            if 'ExtraInfo' in job_data:
-                for v in job_data['ExtraInfo']:
-                    index = job_data['ExtraInfo'].index(v)
-                    data += 'ExtraInfo%s=%s\n' % (index, v)
-                del job_data['ExtraInfo']
+            if "ExtraInfo" in job_data:
+                for v in job_data["ExtraInfo"]:
+                    index = job_data["ExtraInfo"].index(v)
+                    data += "ExtraInfo%s=%s\n" % (index, v)
+                del job_data["ExtraInfo"]
 
-            if 'DraftTemplates' in job_data:
-                for t in job_data['DraftTemplates']:
-                    index = job_data['DraftTemplates'].index(t)
-                    name = 'DraftTemplate%s' % index
-                    job_data['ExtraInfoKeyValue'][name] = t
-                del job_data['DraftTemplates']
-
-            if 'ExtraInfoKeyValue' in job_data:
+            if "ExtraInfoKeyValue" in job_data:
                 index = 0
-                for entry in job_data['ExtraInfoKeyValue']:
-                    data += 'ExtraInfoKeyValue%s=' % index
-                    data += '%s=' % entry
-                    data += '%s\n' % job_data['ExtraInfoKeyValue'][entry]
+                for entry in job_data["ExtraInfoKeyValue"]:
+                    data += "ExtraInfoKeyValue%s=" % index
+                    data += "%s=" % entry
+                    data += "%s\n" % job_data["ExtraInfoKeyValue"][entry]
                     index += 1
-                del job_data['ExtraInfoKeyValue']
+                del job_data["ExtraInfoKeyValue"]
 
             for entry in job_data:
-                data += '%s=%s\n' % (entry, job_data[entry])
+                data += "%s=%s\n" % (entry, job_data[entry])
 
             current_dir = tempfile.gettempdir()
-            filename = job_data['Name'].replace(':', '_') + '.job.txt'
+            filename = str(submission_id) + ".job.txt"
             job_path = os.path.join(current_dir, filename)
 
-            with open(job_path, 'w') as outfile:
+            with open(job_path, "w") as outfile:
                 outfile.write(data)
 
-            self.log.info('job data:\n\n%s' % data)
-
-            # getting plugin data
-            plugin_data = instance.data('deadlineData')['plugin']
-
-            if 'SceneFile' not in plugin_data:
-                plugin_data['SceneFile'] = scene_file
-            else:
-                if not plugin_data['SceneFile']:
-                    del plugin_data['SceneFile']
+            self.log.info("job data:\n\n%s" % data)
 
             # writing plugin data
-            data = ''
+            plugin_data = instance.data("deadlineData")["plugin"]
+            data = ""
             for entry in plugin_data:
-                data += '%s=%s\n' % (entry, plugin_data[entry])
+                data += "%s=%s\n" % (entry, plugin_data[entry])
 
             current_dir = tempfile.gettempdir()
-            filename = job_data['Name'].replace(':', '_') + '.plugin.txt'
+            filename = str(submission_id) + ".plugin.txt"
             plugin_path = os.path.join(current_dir, filename)
 
-            with open(plugin_path, 'w') as outfile:
+            with open(plugin_path, "w") as outfile:
                 outfile.write(data)
 
-            self.log.info('plugin data:\n\n%s' % data)
+            self.log.info("plugin data:\n\n%s" % data)
 
             # submitting job
             args = [job_path, plugin_path]
 
-            if 'auxiliaryFiles' in instance.data['deadlineData']:
-                aux_files = instance.data('deadlineData')['auxiliaryFiles']
+            if "auxiliaryFiles" in instance.data["deadlineData"]:
+                aux_files = instance.data("deadlineData")["auxiliaryFiles"]
                 if isinstance(aux_files, list):
                     args.extend(aux_files)
                 else:
                     args.append(aux_files)
 
-            # submitting remotely
-            success = True
-            try:
-                from pyblish_deadline.vendor import requests
-
-                d = os.path.dirname
-                config = d(d(d(inspect.getfile(inspect.currentframe()))))
-                config = os.path.join(config, 'config.json')
-
-                data = ''
-                with open(config) as f:
-                    data = json.load(f)
-                    f.close()
-                url = '%s:%s/api/jobs' % (data['address'], data['port'])
-
-                payload = {'JobInfo': job_data, 'PluginInfo': plugin_data,
-                           'AuxFiles': []}
-                r = requests.post(url, auth=(data['username'],
-                                  data['password']), data=json.dumps(payload))
-
-                if r.status_code != 200:
-                    success = False
-            except Exception as e:
-                self.log.warning(e)
-                success = False
-            finally:
-                if success:
-                    msg = 'Successfully submitted to remote repository.'
-                    self.log.info(msg)
-                    return
-                else:
-                    self.log.info('Failed to submit to remote repository.')
-
-            # submitting locally
+            # submitting
             try:
                 result = self.CallDeadlineCommand(args)
 
                 self.log.info(result)
 
-                job_id = re.search(r'JobID=(.*)', result).groups()[0]
-                instance.set_data('jobId', value=job_id)
+                job_id = re.search(r"JobID=(.*)", result).groups()[0]
+                instance.set_data("jobId", value=job_id)
             except:
                 raise ValueError(traceback.format_exc())
 
@@ -218,15 +161,15 @@ class IntegrateDeadline(pyblish.api.Integrator):
                 deadlineBin = f.read().strip()
                 deadlineCommand = deadlineBin + "/deadlinecommand"
         else:
-            deadlineBin = os.environ['DEADLINE_PATH']
-            if os.name == 'nt':
+            deadlineBin = os.environ["DEADLINE_PATH"]
+            if os.name == "nt":
                 deadlineCommand = deadlineBin + "\\deadlinecommand.exe"
             else:
                 deadlineCommand = deadlineBin + "/deadlinecommand"
 
         startupinfo = None
-        if hideWindow and os.name == 'nt' and hasattr(subprocess,
-                                                      'STARTF_USESHOWWINDOW'):
+        if hideWindow and os.name == "nt" and hasattr(subprocess,
+                                                      "STARTF_USESHOWWINDOW"):
             startupinfo = subprocess.STARTUPINFO()
             startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
 
@@ -236,9 +179,9 @@ class IntegrateDeadline(pyblish.api.Integrator):
 
         # Need to set the PATH, cuz windows seems to load DLLs from the PATH
         # earlier that cwd....
-        if os.name == 'nt':
-            path = str(deadlineBin + os.pathsep + os.environ['PATH'])
-            environment['PATH'] = path
+        if os.name == "nt":
+            path = str(deadlineBin + os.pathsep + os.environ["PATH"])
+            environment["PATH"] = path
 
         arguments.insert(0, deadlineCommand)
 
