@@ -1,9 +1,8 @@
 ﻿Enabled=True
-PythonExecutable=C:\Python27\python.exe;/usr/bin/python
-PythonSearchPaths=K:/development/tools/pyblish/pyblish-base;K:/development/tools/pipeline-schema;K:/development/tools/ftrack/ftrack-api;K:/development/tools/pyblish/pyblish-ftrack;K:/development/tools/pyblish/pyblish-deadline
-OnJobSubmittedPaths=K:/development/tools/pyblish/pyblish-deadline/pyblish_deadline/plugins;K:/development/tools/pyblish/pyblish-bumpybox/pyblish_bumpybox/plugins/deadline/OnJobSubmitted
+PythonSearchPaths=
+OnJobSubmittedPaths=
 OnJobStartedPaths=
-OnJobFinishedPaths=K:/development/tools/pyblish/pyblish-bumpybox/pyblish_bumpybox/plugins/deadline/OnJobFinished;K:/development/tools/pyblish/pyblish-ftrack/pyblish_ftrack/plugins;K:/development/tools/pyblish/pyblish-bumpybox/pyblish_bumpybox/plugins/deadline/OnJobFinished/pipeline_specific
+OnJobFinishedPaths=
 OnJobRequeuedPaths=
 OnJobFailedPaths=
 LoggingLevel=DEBUG
