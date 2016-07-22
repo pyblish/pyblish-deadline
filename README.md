@@ -136,20 +136,26 @@ Using Pyblish to submit job to the farm, doesn't have to be the end. With the ev
 
 The event plugin is design to be as flexible as Pyblish, so you can design or use any Pyblish plugin you wish. You can even use ```pyblish-deadline``` to submit jobs, and chain publishes together.
 
+**Installation**
+
+To install the event plugin, you need to copy or otherwise link ```pyblish_deadline\event_plugin\Pyblish``` directory to ```[DEADLINE REPO]\custom\events\Pyblish```. Deadline will then pickup the event plugin, and you should have a new ```Pyblish``` entry in ```Deadline Monitor > Tools > Configure Events...```.
+
 **Usage**
 
-You have all the events in Deadline to trigger a publish from, and you can adjust all the settings in ```Tools``` > ```Configure Events...``` > ```Pyblish```.
+You have all the events in Deadline to trigger a publish from, and you can adjust all the settings in ```Deadline Monitor > Tools > Configure Events... > Pyblish```.
 Here you can also globally enabled the plugin.
 
 Similar to how all Pyblish integrations work, you need to modify the ```PYTHONPATH``` environment variable to be able to import any python modules. You can easily modify this in the event plugin setting ```Additional Python Search Paths```.
 
 The integration also follows Pyblish workflow, by setting the environment variable ```PYBLISHPLUGINPATH``` per event. You can have different plugins triggered depending on the event by pointing to different directories. You can input the directories in the; ```Job Plugins```, ```Respository Plugins```, ```Slave Plugins``` and ```Power Management Plugins``` section.
 
-When a plugin is run, there are data available to utilize; ```context.data```, ```context.data["deadlineJob"]``` and ```context.data["deadlineAdditionalData"]```.
+When a plugin is run, there are data available to utilize; ```context.data```, ```context.data["deadlineJob"]```, ```context.data["deadlineEvent"] and ```context.data["deadlineAdditionalData"]```.
 
 ```context.data``` is inheriting data from the submission. If the job was submitted through ```pyblish-deadline```, the same ```context.data``` available.
 
 ```context.data["deadlineJob"]``` is the Deadline job object. From this object you can collect data about the job, by following the standard Deadline scripting reference; http://docs.thinkboxsoftware.com/products/deadline/8.0/2_Scripting%20Reference/class_deadline_1_1_jobs_1_1_job.html
+
+```context.data["deadlineEvent"]``` is the event triggering the publish.
 
 ```context.data["deadlineAdditionalData"]``` is additional data that might occur on different events. Currently this is only available on the ```OnJobError``` event, where you get the task and error report.
 
