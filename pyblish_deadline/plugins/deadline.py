@@ -60,17 +60,42 @@ class IntegrateDeadline(pyblish.api.Integrator):
             # getting job data
             job_data = instance.data("deadlineData")["job"]
 
-            data = json.dumps(instance.data)
+            # setting instance data
+            data = {}
+            for key in instance.data:
+                try:
+                    json.dumps(instance.data[key])
+                    data[key] = instance.data[key]
+                except:
+                    msg = "\"{0}\"".format(instance.data[key])
+                    msg += " in instance.data[\"{0}\"]".format(key)
+                    msg += " could not be serialized."
+                    self.log.warning(msg)
+            data = json.dumps(data)
+
             if "ExtraInfoKeyValue" in job_data:
                 job_data["ExtraInfoKeyValue"]["PyblishInstanceData"] = data
             else:
                 job_data["ExtraInfoKeyValue"] = {"PyblishInstanceData": data}
 
-            data = instance.context.data.copy()
-            del data["results"]
+            # setting context data
+            context_data = instance.context.data.copy()
+            del context_data["results"]
             if "deadlineJob" in data:
-                del data["deadlineJob"]
+                del context_data["deadlineJob"]
+
+            data = {}
+            for key in context_data:
+                try:
+                    json.dumps(context_data[key])
+                    data[key] = context_data[key]
+                except:
+                    msg = "\"{0}\"".format(context_data[key])
+                    msg += " in context.data[\"{0}\"]".format(key)
+                    msg += " could not be serialized."
+                    self.log.warning(msg)
             data = json.dumps(data)
+
             job_data["ExtraInfoKeyValue"]["PyblishContextData"] = data
 
             # setting up dependencies
