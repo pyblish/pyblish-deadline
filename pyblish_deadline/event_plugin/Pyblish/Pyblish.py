@@ -77,12 +77,6 @@ class PyblishEventListener(Deadline.Events.DeadlineEventListener):
 
     def run_pyblish(self, config_entry, job, additonalData={}):
 
-        # returning early if data is not present
-        if "PyblishContextData" not in job.GetJobExtraInfoKeys():
-            return
-        if "PyblishInstanceData" not in job.GetJobExtraInfoKeys():
-            return
-
         # returning early if no plugins are configured
         if not self.GetConfigEntryWithDefault(config_entry, ""):
             return
@@ -91,11 +85,9 @@ class PyblishEventListener(Deadline.Events.DeadlineEventListener):
         paths = self.GetConfigEntryWithDefault("PythonSearchPaths", "").strip()
         paths = paths.split(";")
 
-        # since this runs at all events, we don't want to keep filling sys.path
         for path in paths:
-            if path not in sys.path:
-                self.LogInfo("Extending sys.path with: " + str(path))
-                sys.path.append(path)
+            self.LogInfo("Extending sys.path with: " + str(path))
+            sys.path.append(path)
 
         # clearing previous plugin paths,
         # and adding pyblish plugin search paths
@@ -139,13 +131,14 @@ class PyblishEventListener(Deadline.Events.DeadlineEventListener):
         cxt.data["deadlineAdditionalData"] = additonalData
 
         # recreate context from data
-        data = job.GetJobExtraInfoKeyValue("PyblishContextData")
+        data = job.GetJobExtraInfoKeyValueWithDefault("PyblishContextData", "")
         try:
             data = json.loads(data)
+            cxt.data.update(data)
         except:
-            logger.error("No Pyblish data found.")
-            return
-        cxt.data.update(data)
+            logger.warning("No Pyblish data found.")
+
+        cxt.data["deadlineEvent"] = config_entry.replace("Paths", "")
 
         # run publish
         import pyblish.util
