@@ -81,7 +81,7 @@ class IntegrateDeadline(pyblish.api.Integrator):
             # setting context data
             context_data = instance.context.data.copy()
             del context_data["results"]
-            if "deadlineJob" in data:
+            if "deadlineJob" in context_data:
                 del context_data["deadlineJob"]
 
             data = {}
