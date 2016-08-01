@@ -9,9 +9,10 @@ import json
 import pyblish.api
 
 
-class IntegrateDeadline(pyblish.api.Integrator):
+class IntegrateDeadline(pyblish.api.ContextPlugin):
 
     label = "Deadline Submission"
+    order = pyblish.api.IntegratorOrder
     optional = True
 
     def process(self, context):
