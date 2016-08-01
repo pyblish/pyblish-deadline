@@ -123,6 +123,15 @@ class PyblishEventListener(Deadline.Events.DeadlineEventListener):
         # setup username
         os.environ["LOGNAME"] = job.UserName
 
+        # if pyblish is not available
+        try:
+            __import__("pyblish.api")
+        except ImportError:
+            import traceback
+            print ("Could not load module \"pyblish.api\": %s"
+                   % traceback.format_exc())
+            return
+
         # setup context and injecting deadline job and additional data
         import pyblish.api
         cxt = pyblish.api.Context()
@@ -132,10 +141,10 @@ class PyblishEventListener(Deadline.Events.DeadlineEventListener):
 
         # recreate context from data
         data = job.GetJobExtraInfoKeyValueWithDefault("PyblishContextData", "")
-        try:
+        if data:
             data = json.loads(data)
             cxt.data.update(data)
-        except:
+        else:
             logger.warning("No Pyblish data found.")
 
         cxt.data["deadlineEvent"] = config_entry.replace("Paths", "")
