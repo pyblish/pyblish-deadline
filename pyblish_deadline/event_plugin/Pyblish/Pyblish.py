@@ -4,7 +4,7 @@ import logging
 import json
 
 import Deadline.Events
-import Deadline.Scripting
+import Deadline.Scripting as ds
 
 
 def GetDeadlineEventListener():
@@ -76,6 +76,19 @@ class PyblishEventListener(Deadline.Events.DeadlineEventListener):
         del self.OnMachineRestartCallback
 
     def run_pyblish(self, config_entry, job, additonalData={}):
+
+        plugin_dir = ds.RepositoryUtils.GetEventPluginDirectory("Pyblish")
+
+        # activating pre and post task scripts, if paths are configured
+        if config_entry == "OnJobSubmittedPaths":
+            if self.GetConfigEntryWithDefault("OnPostTaskPaths", ""):
+                job.JobPostTaskScript = os.path.join(plugin_dir,
+                                                     "OnPostTask.py")
+            if self.GetConfigEntryWithDefault("OnPreTaskPaths", ""):
+                job.JobPreTaskScript = os.path.join(plugin_dir,
+                                                    "OnPreTask.py")
+
+        ds.RepositoryUtils.SaveJob(job)
 
         # returning early if no plugins are configured
         if not self.GetConfigEntryWithDefault(config_entry, ""):
@@ -237,11 +250,11 @@ class PyblishEventListener(Deadline.Events.DeadlineEventListener):
 
         self.run_pyblish("OnSlaveIdlePaths", job)
 
-    def OnSlaveRendering(self, job):
+    def OnSlaveRendering(self, slaveName, job):
 
         self.run_pyblish("OnSlaveRenderingPaths", job)
 
-    def OnSlaveStartingJob(self, job):
+    def OnSlaveStartingJob(self, slaveName, job):
 
         self.run_pyblish("OnSlaveStartingJobPaths", job)
 
