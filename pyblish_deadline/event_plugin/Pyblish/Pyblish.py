@@ -82,11 +82,15 @@ class PyblishEventListener(Deadline.Events.DeadlineEventListener):
         # activating pre and post task scripts, if paths are configured
         if config_entry == "OnJobSubmittedPaths":
             if self.GetConfigEntryWithDefault("OnPostTaskPaths", ""):
-                job.JobPostTaskScript = os.path.join(plugin_dir,
-                                                     "OnPostTask.py")
+                path = os.path.join(plugin_dir, "OnPostTask.py")
+                if os.path.exists(path):
+                    job.JobPostTaskScript = path
+                    self.LogInfo("Adding OnPostTask: " + path) 
             if self.GetConfigEntryWithDefault("OnPreTaskPaths", ""):
-                job.JobPreTaskScript = os.path.join(plugin_dir,
-                                                    "OnPreTask.py")
+                path = os.path.join(plugin_dir, "OnPreTask.py")
+                if os.path.exists(path):
+                    job.JobPreTaskScript = path
+                    self.LogInfo("Adding OnPreTask: " + path)
 
         ds.RepositoryUtils.SaveJob(job)
 
