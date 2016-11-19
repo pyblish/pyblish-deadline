@@ -79,13 +79,13 @@ class PyblishEventListener(Deadline.Events.DeadlineEventListener):
 
         plugin_dir = ds.RepositoryUtils.GetEventPluginDirectory("Pyblish")
 
-        # activating pre and post task scripts, if paths are configured
+        # Activating pre and post task scripts, if paths are configured.
         if config_entry == "OnJobSubmittedPaths":
             if self.GetConfigEntryWithDefault("OnPostTaskPaths", ""):
                 path = os.path.join(plugin_dir, "OnPostTask.py")
                 if os.path.exists(path):
                     job.JobPostTaskScript = path
-                    self.LogInfo("Adding OnPostTask: " + path) 
+                    self.LogInfo("Adding OnPostTask: " + path)
             if self.GetConfigEntryWithDefault("OnPreTaskPaths", ""):
                 path = os.path.join(plugin_dir, "OnPreTask.py")
                 if os.path.exists(path):
@@ -94,11 +94,11 @@ class PyblishEventListener(Deadline.Events.DeadlineEventListener):
 
         ds.RepositoryUtils.SaveJob(job)
 
-        # returning early if no plugins are configured
+        # Returning early if no plugins are configured.
         if not self.GetConfigEntryWithDefault(config_entry, ""):
             return
 
-        # adding python search paths
+        # Adding python search paths.
         paths = self.GetConfigEntryWithDefault("PythonSearchPaths", "").strip()
         paths = paths.split(";")
 
@@ -106,8 +106,8 @@ class PyblishEventListener(Deadline.Events.DeadlineEventListener):
             self.LogInfo("Extending sys.path with: " + str(path))
             sys.path.append(path)
 
-        # clearing previous plugin paths,
-        # and adding pyblish plugin search paths
+        # Clearing previous plugin paths,
+        # and adding pyblish plugin search paths.
         os.environ["PYBLISHPLUGINPATH"] = ""
         path = ""
         adding_paths = self.GetConfigEntryWithDefault(config_entry, "").strip()
@@ -123,7 +123,7 @@ class PyblishEventListener(Deadline.Events.DeadlineEventListener):
             self.LogInfo("Setting PYBLISHPLUGINPATH to: \"%s\"" % path)
             os.environ["PYBLISHPLUGINPATH"] = str(path)
 
-        # setup logging
+        # Setup logging.
         level_item = self.GetConfigEntryWithDefault("LoggingLevel", "DEBUG")
         level = logging.DEBUG
 
@@ -137,10 +137,15 @@ class PyblishEventListener(Deadline.Events.DeadlineEventListener):
         logging.basicConfig(level=level)
         logger = logging.getLogger()
 
-        # setup username
-        os.environ["LOGNAME"] = job.UserName
+        # Setup environment
+        if job.GetJobEnvironmentKeys():
+            self.LogInfo("Getting environment from job:")
+            for key in job.GetJobEnvironmentKeys():
+                value = job.GetJobEnvironmentKeyValue(key)
+                os.environ[str(key)] = str(value)
+                self.LogInfo("{0}={1}".format(key, value))
 
-        # if pyblish is not available
+        # If pyblish is not available.
         try:
             __import__("pyblish.api")
         except ImportError:
@@ -149,14 +154,14 @@ class PyblishEventListener(Deadline.Events.DeadlineEventListener):
                    % traceback.format_exc())
             return
 
-        # setup context and injecting deadline job and additional data
+        # Setup context and injecting deadline job and additional data.
         import pyblish.api
         cxt = pyblish.api.Context()
 
         cxt.data["deadlineJob"] = job
         cxt.data["deadlineAdditionalData"] = additonalData
 
-        # recreate context from data
+        # Recreate context from data.
         data = job.GetJobExtraInfoKeyValueWithDefault("PyblishContextData", "")
         if data:
             data = json.loads(data)
@@ -166,14 +171,14 @@ class PyblishEventListener(Deadline.Events.DeadlineEventListener):
 
         cxt.data["deadlineEvent"] = config_entry.replace("Paths", "")
 
-        # run publish
+        # Run publish.
         import pyblish.util
 
         logging.getLogger("pyblish").setLevel(level)
 
         cxt = pyblish.util.publish(context=cxt)
 
-        # error logging needs some work
+        # Error logging needs some work.
         for result in cxt.data["results"]:
             if not result["success"]:
                 logger.error(result)
