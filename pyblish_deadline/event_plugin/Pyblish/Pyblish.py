@@ -98,9 +98,21 @@ class PyblishEventListener(Deadline.Events.DeadlineEventListener):
         if not self.GetConfigEntryWithDefault(config_entry, ""):
             return
 
+        # Setup environment
+        PYTHONPATH = ""
+        if job.GetJobEnvironmentKeys():
+            self.LogInfo("Getting environment from job:")
+            for key in job.GetJobEnvironmentKeys():
+                value = job.GetJobEnvironmentKeyValue(key)
+                os.environ[str(key)] = str(value)
+                self.LogInfo("{0}={1}".format(key, value))
+                if str(key) == "PYTHONPATH":
+                    PYTHONPATH = str(value)
+
         # Adding python search paths.
         paths = self.GetConfigEntryWithDefault("PythonSearchPaths", "").strip()
         paths = paths.split(";")
+        paths += PYTHONPATH.split(os.pathsep)
 
         for path in paths:
             self.LogInfo("Extending sys.path with: " + str(path))
@@ -136,14 +148,6 @@ class PyblishEventListener(Deadline.Events.DeadlineEventListener):
 
         logging.basicConfig(level=level)
         logger = logging.getLogger()
-
-        # Setup environment
-        if job.GetJobEnvironmentKeys():
-            self.LogInfo("Getting environment from job:")
-            for key in job.GetJobEnvironmentKeys():
-                value = job.GetJobEnvironmentKeyValue(key)
-                os.environ[str(key)] = str(value)
-                self.LogInfo("{0}={1}".format(key, value))
 
         # If pyblish is not available.
         try:
