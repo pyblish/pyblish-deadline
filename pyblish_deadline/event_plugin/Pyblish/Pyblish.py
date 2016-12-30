@@ -94,10 +94,6 @@ class PyblishEventListener(Deadline.Events.DeadlineEventListener):
 
         ds.RepositoryUtils.SaveJob(job)
 
-        # Returning early if no plugins are configured.
-        if not self.GetConfigEntryWithDefault(config_entry, ""):
-            return
-
         # Setup environment
         PYTHONPATH = ""
         if job.GetJobEnvironmentKeys():
@@ -123,8 +119,13 @@ class PyblishEventListener(Deadline.Events.DeadlineEventListener):
         os.environ["PYBLISHPLUGINPATH"] = ""
         path = ""
         adding_paths = self.GetConfigEntryWithDefault(config_entry, "").strip()
+        adding_paths += os.pathsep + os.environ.get(config_entry, "")
 
-        if adding_paths != "":
+        # Return early if no plugins were found.
+        if adding_paths == os.pathsep:
+            self.LogInfo("No plugins found.")
+            return
+        else:
             adding_paths.replace(";", os.pathsep)
 
             if path != "":
