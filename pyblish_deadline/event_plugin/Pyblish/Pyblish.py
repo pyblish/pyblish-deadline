@@ -159,8 +159,12 @@ class PyblishEventListener(Deadline.Events.DeadlineEventListener):
                    % traceback.format_exc())
             return
 
-        # Setup context and injecting deadline job and additional data.
         import pyblish.api
+
+        # Register host
+        pyblish.api.register_host("deadline")
+
+        # Setup context and injecting deadline job and additional data.
         cxt = pyblish.api.Context()
 
         cxt.data["deadlineJob"] = job
