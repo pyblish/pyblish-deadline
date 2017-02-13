@@ -127,6 +127,15 @@ class IntegrateDeadline(pyblish.api.ContextPlugin):
                     index += 1
                 del job_data["ExtraInfoKeyValue"]
 
+            if "EnvironmentKeyValue" in job_data:
+                index = 0
+                for entry in job_data["EnvironmentKeyValue"]:
+                    data += "EnvironmentKeyValue%s=" % index
+                    data += "%s=" % entry
+                    data += "%s\n" % job_data["EnvironmentKeyValue"][entry]
+                    index += 1
+                del job_data["EnvironmentKeyValue"]
+
             for entry in job_data:
                 data += "%s=%s\n" % (entry, job_data[entry])
 
